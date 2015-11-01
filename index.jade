@@ -1,6 +1,12 @@
 head
-    title: | Test riproduzione cassette    
+    title: | Tape.js Demonstration
+    
+    //: Carica il foglio di stile css
+    
     link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css", rel="stylesheet", type="text/css")
+    
+    //: Carica le librerie in javascript
+    
     script(type="text/javascript", src="https://code.jquery.com/jquery-1.11.3.min.js")        
     script(type="text/javascript", src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js")
     script(type="text/javascript", src="js/riffwave.js")
@@ -9,14 +15,39 @@ head
 body
     div.container
         div.row
-            div.col-12
+            div.col-md-12
                 br
         div.row
-            div.col-12
-                strong: | Test MSX
+            div.col-md-12
+                strong 
+                    h1: | Tape.js
+                hr
+                p
+                    | This is a test to demonstrates that now with HTML5 Audio 
+                    | is possible to encode MSX program into audio files 
+                    | directly from Javascript. All you need is a modern web 
+                    | browser like Chrome 38+, Safari 6+ and Firefox 27+
+                h4
+                    | I didn't understand a single word... what did you just say?! 
+                p
+                    | Old home computers such as the 
+                    a(href="https://en.wikipedia.org/wiki/MSX"): | MSX
+                    |  used to load programs from tapes. Until now... 
+                    | [TO BE CONTINUED]
+                p
+                    | For further information please have a look at this 
+                    | web page: 
+                    a(href="http://www.github.com/fmaida/tapejs")
+                        | http://www.github.com/fmaida/tapejs
+                
                 br
+                p 
+                    | Connect your audio headphone jack to your MSX and click on
+                    | play. A basic program should be loaded in memory in 
+                    | less than 40 seconds.
                 br
     
                 button.btn.btn-default#esegui
                     | Esegui audio
+    
     script(type="text/javascript", src="min/script-min.js")
