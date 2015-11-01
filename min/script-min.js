@@ -1,0 +1,1 @@
+$(document).ready(function(){var i=!1;$("button#esegui").html("Riproduci"),$("button#esegui").click(function(){i===!1?($(this).html("Pausa"),msx.audio.play(),i=!0):($(this).html("Riproduci"),msx.audio.pause(),i=!1)})});
