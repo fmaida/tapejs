@@ -124,18 +124,21 @@ msx = {
         msx.wave = new RIFFWAVE(); // create an empty wave file
         msx.data = []; // yes, it's an array
 
-        msx.parametri.blocco_intestazione = [0x1f, 0xa6, 0xde, 0xba, 0xcc, 0x13, "}".charCodeAt(0), "t".charCodeAt(0)];
+        msx.parametri.blocco_intestazione = [31, 166, 222, 186, 204, 19, 125, 116];
+                                            // [0x1f, 0xa6, 0xde, 0xba, 0xcc,
+                                            //  0x13, "}".charCodeAt(0), "t".charCodeAt(0)];
 
         // blocco_file_binario = "\xd0" * 10  # chr(int(0xD0)) * 10
         // blocco_file_basic = "\xd3" * 10  # chr(int(0xD3)) * 10
-        msx.parametri.blocco_file_ascii = [0xea, 0xea, 0xea, 0xea, 0xea, 0xea, 0xea, 0xea, 0xea, 0xea];
+        msx.parametri.blocco_file_ascii = [0xea, 0xea, 0xea, 0xea, 0xea,
+                                           0xea, 0xea, 0xea, 0xea, 0xea];
 
         msx.parametri.frequenza = 19200,  // 19.200hz
         msx.parametri.bitrate = 1200,  // 1200bps
         msx.parametri.ampiezza = 0.98,  // 98% dell'ampiezza massima
 
-        msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
-        msx.wave.header.numChannels = 1; // one channels (mono)
+        msx.wave.header.sampleRate = msx.parametri.frequenza;
+        msx.wave.header.numChannels = 1; // Un solo canale audio (mono)
 
         msx.ricalcola_onde()
 
