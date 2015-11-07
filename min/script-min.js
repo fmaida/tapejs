@@ -1,1 +1,1 @@
-$(document).ready(function(){var i=!1;$("button#esegui").html("Riproduci"),$("button#esegui").click(function(){i===!1?($(this).html("Pausa"),msx.audio.play(),i=!0):($(this).html("Riproduci"),msx.audio.pause(),i=!1)})});
+$(document).ready(function(){var t=!1;$("button#esegui").html("Riproduci"),$("button#esegui").click(function(){t===!1?($(this).html("Pausa"),msx.audio.play(),t=!0):($(this).html("Riproduci"),msx.audio.pause(),t=!1)}),$("button#salva").click(function(){var t=new Blob([window.btoa(msx.wave.dataURI)]);saveAs(t,"output.wav")})});
