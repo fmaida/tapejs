@@ -7,7 +7,7 @@ $(document).ready(function(){
     $("button#esegui").html("Riproduci");
 
     // Quando il pulsante "Ripoduci" viene cliccato...
-    $("button#esegui").click(function(){
+    $("button#esegui").click(function() {
         if (riproduci === false) {
             // ...se non stava riproducendo, avvia l'audio
             $(this).html("Pausa");
@@ -20,6 +20,12 @@ $(document).ready(function(){
             msx.audio.pause();
             riproduci = false;
         }
+    });
+
+    // Quando il pulsante "Salva" viene cliccato...
+    $("button#salva").click(function() {
+        var blob = new Blob([window.btoa(msx.wave.dataURI)]);
+        saveAs(blob, "output.wav");
     });
 
 });
