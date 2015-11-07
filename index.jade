@@ -11,7 +11,9 @@ mixin banner_github(p_url)
 //: Da qui in poi inizia la pagina web vera e propria
 
 head
-    title: | Tape.js Demonstration
+    title
+        | Tape.js Demonstration
+    meta(charset="utf-8")
     
     //: Carica il foglio di stile css
     
@@ -36,12 +38,18 @@ body
                     h1: | Tape.js
                 hr
                 p
-                    | This is a test to demonstrates that now with HTML5 Audio 
-                    | is possible to encode MSX program into audio files 
-                    | directly from Javascript. All you need is a modern web 
-                    | browser like Chrome 38+, Safari 6+ and Firefox 27+
-                h4
-                    | I didn't understand a single word... what did you just say?! 
+                    | Questo è un test per dimostrare che ora con le nuove
+                    | capacità offerte da HTML5 Audio è possibile codificare
+                    | un programma MSX in un file audio direttamente da Javascript. 
+                    | Tutto quello di cui abbiamo bisogno è un browser moderno 
+                    | come Chrome 38+, Safari 6+ e Firefox 27+
+                p
+                    em
+                        | This is a test to demonstrates that now with HTML5 Audio 
+                        | is possible to encode MSX program into audio files 
+                        | directly from Javascript. All you need is a modern web 
+                        | browser like Chrome 38+, Safari 6+ and Firefox 27+
+                hr
                 p
                     | Old home computers such as the 
                     a(href="https://en.wikipedia.org/wiki/MSX"): | MSX
@@ -54,12 +62,25 @@ body
                         | http://www.github.com/fmaida/tapejs
                 
                 br
+                h4
+                    | Instructions
                 p 
-                    | Connect your audio headphone jack to your MSX and click on
-                    | play. A basic program should be loaded in memory in 
-                    | less than 40 seconds.
+                    | Connect your audio headphone jack from your real MSX 
+                    | machine to the audio out of your device (computer, 
+                    | smartphone or tablet). Then enter RUN "CAS:" on your MSX
+                    | and push the play button on this website. If everything 
+                    | works properly, a basic program should be loaded in less
+                    | than 30 seconds.                
                 br
-    
+                h4
+                    | Known bugs
+                p
+                    | Sometimes you'll get no audio from the app. In that case, 
+                    | close this browser tab and open this website again in a                     
+                    | new tab. I still don't know why this happens...
+                br
+                br
+                
                 button.btn.btn-default#esegui
                     | Esegui audio
                     
