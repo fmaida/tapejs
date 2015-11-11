@@ -93,8 +93,10 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    inserisci_stringa: function(p_stringa)
+    inserisci_stringa: function(p_stringa, p_a_capo)
     {
+        p_a_capo = typeof p_a_capo !== 'undefined' ? p_a_capo : true;
+
         var i = 0;
         for(i = 0; i < p_stringa.length; i++) {
             msx.inserisci_byte(p_stringa.charCodeAt(i));
@@ -107,9 +109,11 @@ msx = {
             }
         }
 
-        msx.inserisci_byte(0x0D);
-        msx.inserisci_byte(0x0A);
-        msx.conto_bytes += 2;
+        if (p_a_capo) {
+            msx.inserisci_byte(0x0D);
+            msx.inserisci_byte(0x0A);
+            msx.conto_bytes += 2;
+        }
 
         if (msx.conto_bytes > 255) {
             // msx.inserisci_array([0x1A]); // EOF
@@ -174,7 +178,7 @@ msx = {
         msx.inserisci_sincronismo(2500);
 
         msx.inserisci_array(msx.parametri.blocco_file_ascii);
-        msx.inserisci_stringa("TAPEJS");
+        msx.inserisci_stringa("TAPEJS", false);
 
         msx.inserisci_silenzio(2000);
 
@@ -187,7 +191,11 @@ msx = {
         msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"");
         msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
         msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
-        for(i=msx.conto_bytes;i<255;i++) {
+
+        msx.inserisci_silenzio(750);
+        msx.inserisci_sincronismo(1500);
+
+        for(i=0;i<255;i++) {
             msx.inserisci_array([0x1A]); // EOF
         }
 
