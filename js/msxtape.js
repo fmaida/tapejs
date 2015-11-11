@@ -3,6 +3,7 @@ msx = {
     // -=-=---------------------------------------------------------------=-=-
 
     parametri: {},
+    conto_bytes: 0,
 
     // -=-=---------------------------------------------------------------=-=-
 
@@ -82,12 +83,41 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
+    inserisci_array: function(p_array)
+    {
+        var i = 0;
+        for(i = 0; i < p_array.length; i++) {
+            msx.inserisci_byte(p_array[i]);
+        }
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
     inserisci_stringa: function(p_stringa)
     {
         var i = 0;
         for(i = 0; i < p_stringa.length; i++) {
-            msx.inserisci_byte(p_stringa[i]);
+            msx.inserisci_byte(p_stringa.charCodeAt(i));
+            msx.conto_bytes += 1;
+            if (msx.conto_bytes > 255) {
+                // msx.inserisci_array([0x1A]); // EOF
+                msx.inserisci_silenzio(1000);
+                msx.inserisci_sincronismo(2000);
+                msx.conto_bytes = 0;
+            }
         }
+
+        msx.inserisci_byte(0x0D);
+        msx.inserisci_byte(0x0A);
+        msx.conto_bytes += 2;
+
+        if (msx.conto_bytes > 255) {
+            // msx.inserisci_array([0x1A]); // EOF
+            msx.inserisci_silenzio(1000);
+            msx.inserisci_sincronismo(2000);
+            msx.conto_bytes = 0;
+        }
+
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -129,11 +159,12 @@ msx = {
         // blocco_file_binario = "\xd0" * 10  # chr(int(0xD0)) * 10
         // blocco_file_basic = "\xd3" * 10  # chr(int(0xD3)) * 10
         msx.parametri.blocco_file_ascii = [0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA];
+        msx.parametri.blocco_file_basic = [0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3];
         msx.parametri.blocco_file_binario = [0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0];
 
-        msx.parametri.frequenza = 44100,  // 19.200hz
+        msx.parametri.frequenza = 19200,  // 19.200hz
         msx.parametri.bitrate = 1200,  // 1200bps
-        msx.parametri.ampiezza = 0.8,  // 80% dell'ampiezza massima
+        msx.parametri.ampiezza = 0.85,  // 80% dell'ampiezza massima
 
         msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
         msx.wave.header.numChannels = 1; // one channels (mono)
@@ -142,21 +173,23 @@ msx = {
 
         msx.inserisci_sincronismo(2500);
 
-        msx.inserisci_stringa(msx.parametri.blocco_intestazione);
-        msx.inserisci_stringa(msx.parametri.blocco_file_ascii);
-        msx.inserisci_stringa("MYTEST");
+        msx.inserisci_array(msx.parametri.blocco_file_ascii);
+        msx.inserisci_stringa("TAPEJS");
 
         msx.inserisci_silenzio(2000);
 
         msx.inserisci_sincronismo(2500);
 
-        msx.inserisci_stringa("10 SCREEN 2 : KEY OFF : CLS\r\n");
-        msx.inserisci_stringa("20 PRINT \"----------------------------------\"\r\n");
-        msx.inserisci_stringa("30 PRINT \"CIAO A TUTTI BELLI E BRUTTI\"\r\n");
-        msx.inserisci_stringa("40 PRINT \"SE RIUSCITE A VEDERE QUESTO MESSAGGIO\"\r\n");
-        msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"\r\n");
-        msx.inserisci_stringa("60 PRINT \"----------------------------------\"\r\n");
-        msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"\r\n");
+        msx.inserisci_stringa("10 KEY OFF : CLS");
+        msx.inserisci_stringa("20 PRINT \"----------------------------------\"");
+        msx.inserisci_stringa("30 PRINT \"CIAO A TUTTI BELLI E BRUTTI\"");
+        msx.inserisci_stringa("40 PRINT \"SE RIUSCITE A VEDERE QUESTO MESSAGGIO\"");
+        msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"");
+        msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
+        msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
+        for(i=msx.conto_bytes;i<255;i++) {
+            msx.inserisci_array([0x1A]); // EOF
+        }
 
         // i = 0;
         // j = 0;
