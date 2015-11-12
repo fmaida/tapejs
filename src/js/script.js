@@ -6,7 +6,7 @@ $(document).ready(function(){
     // Cambia il testo nel pulsante
     $("button#esegui").html("Play");
 
-    $(document).load("/src/example/roadf.cas", "", function(p_data) {
+    $(document).load("src/example/roadf.cas", "", function(p_data) {
         msx.load(p_data);
     });
 
