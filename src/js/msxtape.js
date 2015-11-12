@@ -4,6 +4,10 @@ msx = {
 
     parametri: {},
     conto_bytes: 0,
+    sincronismo_lungo: 2500,
+    sincronismo_corto: 1500,
+    silenzio_lungo: 2500,
+    silenzio_corto: 1500,
 
     // -=-=---------------------------------------------------------------=-=-
 
@@ -158,13 +162,15 @@ msx = {
         msx.wave = new RIFFWAVE(); // create an empty wave file
         msx.data = []; // yes, it's an array
 
-        msx.parametri.blocco_intestazione = [0x1f, 0xa6, 0xde, 0xba, 0xcc, 0x13, "}".charCodeAt(0), "t".charCodeAt(0)];
+        msx.parametri.blocco_intestazione = [0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
+                                             0x13, 0x7D, 0x74];
 
-        // blocco_file_binario = "\xd0" * 10  # chr(int(0xD0)) * 10
-        // blocco_file_basic = "\xd3" * 10  # chr(int(0xD3)) * 10
-        msx.parametri.blocco_file_ascii = [0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA, 0xEA];
-        msx.parametri.blocco_file_basic = [0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3];
-        msx.parametri.blocco_file_binario = [0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0];
+        msx.parametri.blocco_file_ascii = [0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
+                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA];
+        msx.parametri.blocco_file_basic = [0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
+                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3];
+        msx.parametri.blocco_file_binario = [0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0];
 
         msx.parametri.frequenza = 19200,  // 19.200hz
         msx.parametri.bitrate = 1200,  // 1200bps
@@ -175,14 +181,14 @@ msx = {
 
         msx.ricalcola_onde()
 
-        msx.inserisci_sincronismo(2500);
+        msx.inserisci_sincronismo(msx.sincronismo_lungo);
 
         msx.inserisci_array(msx.parametri.blocco_file_ascii);
         msx.inserisci_stringa("TAPEJS", false);
 
-        msx.inserisci_silenzio(2000);
+        msx.inserisci_silenzio(msx.silenzio_corto);
 
-        msx.inserisci_sincronismo(2500);
+        msx.inserisci_sincronismo(msx.sincronismo_corto);
 
         msx.inserisci_stringa("10 KEY OFF : CLS");
         msx.inserisci_stringa("20 PRINT \"----------------------------------\"");
@@ -192,23 +198,12 @@ msx = {
         msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
         msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
 
-        msx.inserisci_silenzio(750);
-        msx.inserisci_sincronismo(1500);
+        msx.inserisci_silenzio(msx.silenzio_corto);
+        msx.inserisci_sincronismo(msx.sincronismo_corto);
 
         for(i=0;i<255;i++) {
             msx.inserisci_array([0x1A]); // EOF
         }
-
-        // i = 0;
-        // j = 0;
-        // while (i < msx.parametri.bitrate * msx.parametri.campionamenti) {
-        //     msx.inserisci_byte(j);
-        //     i += msx.parametri.wave_bit_1.length;
-        //     j++;
-        //     if(j > 255) {
-        //         j = 0;
-        //     }
-        // }
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source

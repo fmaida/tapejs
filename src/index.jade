@@ -18,17 +18,16 @@ head
     //: Carica il foglio di stile css
     
     link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css", rel="stylesheet", type="text/css")
+    link(href="css/style.css", rel="stylesheet", type="text/css")
     
     //: Carica le librerie in javascript
     
     script(type="text/javascript", src="js/jquery-1.11.3.min.js")
     //: script(type="text/javascript", src="https://code.jquery.com/jquery-1.11.3.min.js")        
     script(type="text/javascript", src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js")
-    script(type="text/javascript", src="js/FileSaver.js")
-    //: script(type="text/javascript", src="js/min/FileSaver-min.js")
-    script(type="text/javascript", src="js/riffwave.js")
-    script(type="text/javascript", src="js/msxtape.js")
-    //: script(type="text/javascript", src="js/min/msxtape-min.js")
+    script(type="text/javascript", src="js/FileSaver-min.js")    
+    script(type="text/javascript", src="js/riffwave-min.js")
+    script(type="text/javascript", src="js/msxtape-min.js")    
 
 body
     div.container
@@ -36,7 +35,7 @@ body
             div.col-md-12                
                 br
         div.row
-            div.col-md-12
+            div.col-md-12                
                 strong 
                     h1: | Tape.js
                 hr
@@ -101,9 +100,13 @@ body
                     
                 button.btn#salva
                     | Salva il file
+                
+                br                
+                
+                img#logo(src="src/img/kaiko_logo.png", alt="Kaiko")
     
                     
-    +banner_github("https://github.com/fmaida/tapejs/")
+    //: +banner_github("https://github.com/fmaida/tapejs/")
     
-    script(type="text/javascript", src="script.js")
+    script(type="text/javascript", src="js/script-min.js")
     //: script(type="text/javascript", src="min/script-min.js")
