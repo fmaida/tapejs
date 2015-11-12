@@ -4,7 +4,7 @@ $(document).ready(function(){
     var riproduci = false;
 
     // Cambia il testo nel pulsante
-    $("button#esegui").html("Play");
+    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
 
     $(document).load("src/example/roadf.cas", "", function(p_data) {
         msx.load(p_data);
@@ -14,13 +14,13 @@ $(document).ready(function(){
     $("button#esegui").click(function() {
         if (riproduci === false) {
             // ...se non stava riproducendo, avvia l'audio
-            $(this).html("Pause");
+            $(this).html("<span class='glyphicon glyphicon-pause'></span> Pause");
             msx.audio.play();
             riproduci = true;
         } else {
             // ...altrimenti mette in pausa la riproduzione
             // (non riesco a trovare un metodo "stop")
-            $(this).html("Play");
+            $(this).html("<span class='glyphicon glyphicon-play'></span> Play");
             msx.audio.pause();
             riproduci = false;
         }
