@@ -100,18 +100,27 @@ body
                         a(href="https://github.com/eligrey/FileSaver.js/")
                             | FileSaver.js 
                         | by Eli Grey.
-                br
                 
-                button.btn.btn-default#esegui
-                    | Esegui audio
+        div.row#pulsantiera
+            div.col-md-3.col-sm-4
+            
+                button.btn.btn-default.btn-block#esegui
+                    | Play
+            
+            div.col-md-3.col-sm-4
                     
-                button.btn#salva
+                button.btn.btn-block#salva
                     | Salva il file
+                    
+            div.col-md-6.col-sm-4
                 
-                br                
-                
-                img#logo(src="src/img/kaiko_logo.png", alt="Kaiko")
-    
+                                
+        div.row
+            div.col-md-12
+            
+                a(href="http://www.kaiko.it")
+                    img#logo(src="src/img/kaiko_logo.png", alt="Kaiko")
+                    
                     
     //: +banner_github("https://github.com/fmaida/tapejs/")
     
