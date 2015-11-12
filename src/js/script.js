@@ -6,6 +6,10 @@ $(document).ready(function(){
     // Cambia il testo nel pulsante
     $("button#esegui").html("Play");
 
+    $(document).load("/src/example/roadf.cas", "", function(p_data) {
+        msx.load(p_data);
+    });
+
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button#esegui").click(function() {
         if (riproduci === false) {

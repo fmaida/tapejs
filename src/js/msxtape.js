@@ -207,6 +207,16 @@ msx = {
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    /**
+    Carica un file in memoria
+    */
+    load: function(p_data)
+    {
+        // ...
     }
 
 }
