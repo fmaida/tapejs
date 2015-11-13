@@ -3,6 +3,12 @@ $(document).ready(function(){
 
     var riproduci = false;
 
+    // Dice a jQuery di utilizzare la codifica ASCII per trasferire i files
+    $.ajaxSetup({
+    'beforeSend' : function(xhr) {
+        xhr.overrideMimeType('text/html; charset=ASCII');
+    })
+
     // Cambia il testo nel pulsante
     $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
 

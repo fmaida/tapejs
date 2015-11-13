@@ -97,35 +97,14 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    inserisci_stringa: function(p_stringa, p_a_capo)
+    inserisci_stringa: function(p_stringa)
     {
         p_a_capo = typeof p_a_capo !== 'undefined' ? p_a_capo : true;
 
         var i = 0;
         for(i = 0; i < p_stringa.length; i++) {
             msx.inserisci_byte(p_stringa.charCodeAt(i));
-            msx.conto_bytes += 1;
-            if (msx.conto_bytes > 255) {
-                // msx.inserisci_array([0x1A]); // EOF
-                msx.inserisci_silenzio(1000);
-                msx.inserisci_sincronismo(2000);
-                msx.conto_bytes = 0;
-            }
         }
-
-        if (p_a_capo) {
-            msx.inserisci_byte(0x0D);
-            msx.inserisci_byte(0x0A);
-            msx.conto_bytes += 2;
-        }
-
-        if (msx.conto_bytes > 255) {
-            // msx.inserisci_array([0x1A]); // EOF
-            msx.inserisci_silenzio(1000);
-            msx.inserisci_sincronismo(2000);
-            msx.conto_bytes = 0;
-        }
-
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -181,6 +160,7 @@ msx = {
 
         msx.ricalcola_onde()
 
+        /*
         msx.inserisci_sincronismo(msx.sincronismo_lungo);
 
         msx.inserisci_array(msx.parametri.blocco_file_ascii);
@@ -207,6 +187,20 @@ msx = {
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
+
+        */
+    },
+
+    genera_file: function(p_nome, p_tipo, p_dati)
+    {
+        msx.inserisci_sincronismo(msx.sincronismo_lungo);
+        msx.inserisci_array(p_tipo);
+        msx.inserisci_stringa(p_nome);
+
+        msx.inserisci_silenzio(msx.silenzio_corto);
+
+        msx.inserisci_sincronismo(msx.sincronismo_corto);
+        msx.inserisci_stringa(p_dati);
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -216,7 +210,23 @@ msx = {
     */
     load: function(p_data)
     {
-        // ...
+        msx.intestazione = ""
+        for(var i=0; i < msx.parametri.blocco_intestazione.length; i++) {
+            msx.intestazione += String.fromCharCode(msx.parametri.blocco_intestazione[i]);
+        }
+        msx.p_data = p_data
+        msx.blocco = p_data.split(msx.intestazione)
+        msx.blocco.shift() // Toglie il primo elemento (vuoto) dall'array
+        msx.blocco[0] = msx.blocco[0].substring(10, 16)
+        msx.blocco[2] = msx.blocco[2].substring(10, 16)
+
+        msx.genera_file(msx.blocco[0], msx.parametri.blocco_file_ascii, msx.blocco[1]);
+        msx.inserisci_silenzio(msx.silenzio_lungo);
+        msx.genera_file(msx.blocco[2], msx.parametri.blocco_file_binario, msx.blocco[3]);
+
+        msx.wave.Make(msx.data); // make the wave file
+        msx.audio.src = msx.wave.dataURI; // set audio source
+
     }
 
 }
