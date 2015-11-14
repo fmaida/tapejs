@@ -151,9 +151,9 @@ msx = {
         msx.parametri.blocco_file_binario = [0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
                                              0xD0, 0xD0, 0xD0, 0xD0, 0xD0];
 
-        msx.parametri.frequenza = 19200,  // 19.200hz
-        msx.parametri.bitrate = 1200,  // 1200bps
-        msx.parametri.ampiezza = 0.85,  // 80% dell'ampiezza massima
+        msx.parametri.frequenza = 28800,  // 19.200hz
+        msx.parametri.bitrate = 2400,  // 1200bps
+        msx.parametri.ampiezza = 0.90,  // 80% dell'ampiezza massima
 
         msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
         msx.wave.header.numChannels = 1; // one channels (mono)
@@ -215,7 +215,7 @@ msx = {
             msx.intestazione += String.fromCharCode(msx.parametri.blocco_intestazione[i]);
         }
         msx.p_data = p_data
-        msx.blocco = p_data.split(msx.intestazione)
+        msx.blocco = p_data.split("�޺�}t")
         msx.blocco.shift() // Toglie il primo elemento (vuoto) dall'array
         msx.blocco[0] = msx.blocco[0].substring(10, 16)
         msx.blocco[2] = msx.blocco[2].substring(10, 16)
