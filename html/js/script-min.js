@@ -26,7 +26,6 @@ $(document).ready(function(){
     oReq.onload = function (oEvent) {
         var arrayBuffer = oReq.response; // Note: not oReq.responseText
         if (arrayBuffer) {
-            msx.pinco = arrayBuffer;
             var byteArray = new Uint8Array(arrayBuffer);
             msx.load(byteArray);
         }
