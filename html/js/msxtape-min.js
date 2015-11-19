@@ -258,9 +258,9 @@ msx = {
             p_inizio = msx.p_data.byteLength;
         }
 
-        output = new Uint8Array();
+        output = new Uint8Array(p_fine - p_inizio);
         for(var i = p_inizio; i < p_fine; i++) {
-            output.push(msx.p_data[i]);
+            output[i - p_inizio] = msx.p_data[i];
         }
 
         return output;
@@ -283,8 +283,8 @@ msx = {
         console.log(pos);
 
         msx.blocco = [];
-        msx.blocco[0] = msx.p_data.slice(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1)
-        msx.blocco[1] = msx.p_data.slice(pos[3] + msx.parametri.blocco_intestazione.length, msx.p_data.byteLength)
+        msx.blocco[0] = msx.splitta(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1)
+        msx.blocco[1] = msx.splitta(pos[3] + msx.parametri.blocco_intestazione.length, msx.p_data.byteLength)
         console.log(msx.blocco);
 
         msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
