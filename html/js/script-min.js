@@ -3,18 +3,36 @@ $(document).ready(function(){
 
     var riproduci = false;
 
+
+    // Cambia il testo nel pulsante
+    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
+
+    /*
     // Dice a jQuery di utilizzare la codifica ASCII per trasferire i files
     $.ajaxSetup({
     'beforeSend' : function(xhr) {
         xhr.overrideMimeType('binary');
     }});
 
-    // Cambia il testo nel pulsante
-    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
-
     $(document).load("example/roadf.cas", "", function(p_data) {
         msx.load(p_data);
     });
+    */
+
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", "example/roadf.cas", true);
+    oReq.responseType = "arraybuffer";
+
+    oReq.onload = function (oEvent) {
+        var arrayBuffer = oReq.response; // Note: not oReq.responseText
+        if (arrayBuffer) {
+            msx.pinco = arrayBuffer;
+            var byteArray = new Uint8Array(arrayBuffer);
+            msx.load(byteArray);
+        }
+    }
+
+    oReq.send(null);
 
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button#esegui").click(function() {

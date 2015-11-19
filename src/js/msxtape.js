@@ -53,11 +53,11 @@ msx = {
         } else if (p_bit == 1) {
             onda = par.wave_bit_1;
         } else {
-            onda = par.wave_silenzio
+            onda = par.wave_silenzio;
         }
 
         for(i = 0; i < onda.length; i++) {
-            msx.data.push(onda[i])
+            msx.data.push(onda[i]);
         }
 
     },
@@ -67,22 +67,22 @@ msx = {
     inserisci_byte: function(p_byte)
     {
         // Inserisce un bit di start
-    	msx.inserisci_bit(0)
+    	msx.inserisci_bit(0);
 
         // Otto bit di dati
         var ind;
         for(ind = 0; ind < 8; ind++) {
     		if ((p_byte & 1) == 0) {
-    			msx.inserisci_bit(0)
+    			msx.inserisci_bit(0);
     		} else {
-    			msx.inserisci_bit(1)
+    			msx.inserisci_bit(1);
             }
-    		p_byte = p_byte >> 1  // Bitwise.ShiftRight(P_nByte, 1)
+    		p_byte = p_byte >> 1;  // Bitwise.ShiftRight(P_nByte, 1)
         }
 
     	// Inserisce due bit di stop
-    	msx.inserisci_bit(1)
-    	msx.inserisci_bit(1)
+    	msx.inserisci_bit(1);
+    	msx.inserisci_bit(1);
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -90,7 +90,7 @@ msx = {
     inserisci_array: function(p_array)
     {
         var i = 0;
-        for(i = 0; i < p_array.length; i++) {
+        for(i = 0; i < p_array.byteLength; i++) {
             msx.inserisci_byte(p_array[i]);
         }
     },
@@ -99,9 +99,8 @@ msx = {
 
     inserisci_stringa: function(p_stringa)
     {
-        p_a_capo = typeof p_a_capo !== 'undefined' ? p_a_capo : true;
-
         var i = 0;
+
         for(i = 0; i < p_stringa.length; i++) {
             msx.inserisci_byte(p_stringa.charCodeAt(i));
         }
@@ -141,15 +140,15 @@ msx = {
         msx.wave = new RIFFWAVE(); // create an empty wave file
         msx.data = []; // yes, it's an array
 
-        msx.parametri.blocco_intestazione = [0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
-                                             0x13, 0x7D, 0x74];
+        msx.parametri.blocco_intestazione = new Uint8Array([0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
+                                             0x13, 0x7D, 0x74]);
 
-        msx.parametri.blocco_file_ascii = [0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
-                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA];
-        msx.parametri.blocco_file_basic = [0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
-                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3];
-        msx.parametri.blocco_file_binario = [0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
-                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0];
+        msx.parametri.blocco_file_ascii = new Uint8Array([0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
+                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA]);
+        msx.parametri.blocco_file_basic = new Uint8Array([0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
+                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3]);
+        msx.parametri.blocco_file_binario = new Uint8Array([0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0]);
 
         msx.parametri.frequenza = 28800,  // 19.200hz
         msx.parametri.bitrate = 2400,  // 1200bps
@@ -200,7 +199,71 @@ msx = {
         msx.inserisci_silenzio(msx.silenzio_corto);
 
         msx.inserisci_sincronismo(msx.sincronismo_corto);
-        msx.inserisci_stringa(p_dati);
+        msx.inserisci_array(p_dati);
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    /**
+    Verifica che un blocco di codice sia uguale ad un'altro
+    */
+
+    contiene: function(p_ricerca, p_inizio)
+    {
+        var uguale = true;
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+
+        for(var i = 0; i < p_ricerca.length; i++) {
+            if (msx.p_data[p_inizio + i] !== p_ricerca[i]) {
+                uguale = false;
+                i = p_ricerca.byteLength;
+            }
+        }
+
+        return uguale;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    cerca: function(p_ricerca, p_inizio)
+    {
+        var posizione = -1;
+        var trovato = false;
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+
+        var i = p_inizio;
+        while ((i < msx.p_data.byteLength) && (!trovato)) {
+            if (msx.contiene(p_ricerca, i)) {
+                posizione = i;
+                trovato = true;
+            }
+            i++;
+        }
+
+        return posizione;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    splitta: function(p_inizio, p_fine)
+    {
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+        if (typeof(p_fine) == "undefined") {
+            p_inizio = msx.p_data.byteLength;
+        }
+
+        output = new Uint8Array();
+        for(var i = p_inizio; i < p_fine; i++) {
+            output.push(msx.p_data[i]);
+        }
+
+        return output;
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -210,19 +273,23 @@ msx = {
     */
     load: function(p_data)
     {
-        msx.intestazione = ""
-        for(var i=0; i < msx.parametri.blocco_intestazione.length; i++) {
-            msx.intestazione += String.fromCharCode(msx.parametri.blocco_intestazione[i]);
-        }
         msx.p_data = p_data
-        msx.blocco = p_data.split("�޺�}t")
-        msx.blocco.shift() // Toglie il primo elemento (vuoto) dall'array
-        msx.blocco[0] = msx.blocco[0].substring(10, 16)
-        msx.blocco[2] = msx.blocco[2].substring(10, 16)
 
-        msx.genera_file(msx.blocco[0], msx.parametri.blocco_file_ascii, msx.blocco[1]);
+        pos = [];
+        pos[0] = msx.cerca(msx.parametri.blocco_intestazione)
+        pos[1] = msx.cerca(msx.parametri.blocco_intestazione, pos[0] + 1)
+        pos[2] = msx.cerca(msx.parametri.blocco_intestazione, pos[1] + 1)
+        pos[3] = msx.cerca(msx.parametri.blocco_intestazione, pos[2] + 1)
+        console.log(pos);
+
+        msx.blocco = [];
+        msx.blocco[0] = msx.p_data.slice(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1)
+        msx.blocco[1] = msx.p_data.slice(pos[3] + msx.parametri.blocco_intestazione.length, msx.p_data.byteLength)
+        console.log(msx.blocco);
+
+        msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
         msx.inserisci_silenzio(msx.silenzio_lungo);
-        msx.genera_file(msx.blocco[2], msx.parametri.blocco_file_binario, msx.blocco[3]);
+        msx.genera_file("GAME  ", msx.parametri.blocco_file_binario, msx.blocco[1]);
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
