@@ -130,7 +130,7 @@ msx = {
 
         msx.parametri.frequenza = 28800,  // 19.200hz
         msx.parametri.bitrate = 2400,  // 1200bps
-        msx.parametri.ampiezza = 0.90,  // 80% dell'ampiezza massima
+        msx.parametri.ampiezza = 0.90,  // 90% dell'ampiezza massima
 
         msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
         msx.wave.header.numChannels = 1; // one channels (mono)
