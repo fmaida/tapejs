@@ -310,10 +310,30 @@ msx = {
     /**
     Carica un file in memoria
     */
-    load: function(p_data)
+    load: function(p_file)
     {
-        msx.buffer.carica(p_data);
 
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", p_file, true);
+        oReq.responseType = "arraybuffer";
+
+        oReq.onload = function (oEvent) {
+            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+            if (arrayBuffer) {
+                var byteArray = new Uint8Array(arrayBuffer);
+                msx.buffer.carica(byteArray);
+                msx.load2();
+            }
+        }
+
+        oReq.send(null);
+
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    load2: function()
+    {
         pos = [];
         pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
         pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
@@ -332,9 +352,7 @@ msx = {
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
-
     }
-
 }
 
 msx.inizializza();

@@ -19,19 +19,7 @@ $(document).ready(function(){
     });
     */
 
-    var oReq = new XMLHttpRequest();
-    oReq.open("GET", "example/roadf.cas", true);
-    oReq.responseType = "arraybuffer";
-
-    oReq.onload = function (oEvent) {
-        var arrayBuffer = oReq.response; // Note: not oReq.responseText
-        if (arrayBuffer) {
-            var byteArray = new Uint8Array(arrayBuffer);
-            msx.load(byteArray);
-        }
-    }
-
-    oReq.send(null);
+    msx.load("example/roadf.cas");    
 
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button#esegui").click(function() {
