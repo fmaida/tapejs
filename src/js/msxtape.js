@@ -136,36 +136,6 @@ msx = {
         msx.wave.header.numChannels = 1; // one channels (mono)
 
         msx.ricalcola_onde()
-
-        /*
-        msx.inserisci_sincronismo(msx.sincronismo_lungo);
-
-        msx.inserisci_array(msx.parametri.blocco_file_ascii);
-        msx.inserisci_stringa("TAPEJS", false);
-
-        msx.inserisci_silenzio(msx.silenzio_corto);
-
-        msx.inserisci_sincronismo(msx.sincronismo_corto);
-
-        msx.inserisci_stringa("10 KEY OFF : CLS");
-        msx.inserisci_stringa("20 PRINT \"----------------------------------\"");
-        msx.inserisci_stringa("30 PRINT \"CIAO A TUTTI BELLI E BRUTTI\"");
-        msx.inserisci_stringa("40 PRINT \"SE RIUSCITE A VEDERE QUESTO MESSAGGIO\"");
-        msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"");
-        msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
-        msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
-
-        msx.inserisci_silenzio(msx.silenzio_corto);
-        msx.inserisci_sincronismo(msx.sincronismo_corto);
-
-        for(i=0;i<255;i++) {
-            msx.inserisci_array([0x1A]); // EOF
-        }
-
-        msx.wave.Make(msx.data); // make the wave file
-        msx.audio.src = msx.wave.dataURI; // set audio source
-
-        */
     },
 
     // -=-=---------------------------------------------------------------=-=-
