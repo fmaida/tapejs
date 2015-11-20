@@ -10,7 +10,7 @@ This is an experimental script that tries to use the new HTML5 audio features in
 
 **You can freely use this script for any commercial and non-commercial purpose.** The only thing I'm asking you is to mention my name and the script name if you're going to use it on your website.
 
-There's one other thing you have to know before diving into code: at the moment all the documentation and the variable names are written in Italian. Sorry! I'm waiting to add some necessary features and fix some bugs before considering this code enough stable to take some time and make the code more understandable for everyone else.
+There's one other thing you have to know before diving into code: at the moment all the documentation, the comments on both the code and the commits and the variable names are written in Italian. Sorry! I'm waiting to add some necessary features and fix some bugs before considering this code enough stable to take some time and make the code more understandable for everyone else.
 
 ### Dependencies
 
