@@ -11,6 +11,6 @@ This is an experimental script that tries to use the new HTML5 audio features in
 In order to generate and download a wav file this application makes use of  
 [riffwave.js](http://codebase.es/riffwave/) by Pedro Ladaria and [FileSaver.js](https://github.com/eligrey/FileSaver.js/) by Eli Grey.
 
-### Where I can see a demo of this script ?
+### Where I can find a demo of this script ?
 
 You can try a demo on this page: http://www.kaiko.it/tapejs
