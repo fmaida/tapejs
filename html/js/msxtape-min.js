@@ -1,13 +1,172 @@
-msx = {
+blocco = {
+
+    dati: new Uint8Array(),
 
     // -=-=---------------------------------------------------------------=-=-
 
+    carica: function(p_dati)
+    {
+        blocco.dati = p_dati;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    /**
+    Verifica che un blocco di codice sia uguale ad un'altro
+    */
+
+    contiene: function(p_ricerca, p_inizio)
+    {
+        var uguale = true;
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+
+        for(var i = 0; i < p_ricerca.length; i++) {
+            if (blocco.dati[p_inizio + i] !== p_ricerca[i]) {
+                uguale = false;
+                i = p_ricerca.byteLength;
+            }
+        }
+
+        return uguale;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    cerca: function(p_ricerca, p_inizio)
+    {
+        var posizione = -1;
+        var trovato = false;
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+
+        var i = p_inizio;
+        while ((i < blocco.dati.byteLength) && (!trovato)) {
+            if (blocco.contiene(p_ricerca, i)) {
+                posizione = i;
+                trovato = true;
+            }
+            i++;
+        }
+
+        return posizione;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    splitta: function(p_inizio, p_fine)
+    {
+        if (typeof(p_inizio) == "undefined") {
+            p_inizio = 0;
+        }
+        if (typeof(p_fine) == "undefined") {
+            p_fine = blocco.dati.byteLength;
+        }
+
+        output = new Uint8Array(p_fine - p_inizio);
+
+        if (typeof(blocco.dati.slice) != "undefined") {
+
+            // Se il browser su cui sta girando lo script supporta
+            // il metodo "slice" su di un'array Uint8Array, lo usa
+
+            output = blocco.dati.slice(p_inizio, p_fine);
+
+        } else {
+
+            // Se il browser non supporta il metodo "slice",
+            // lo fa a manina da codice
+
+            for(var i = p_inizio; i < p_fine; i++) {
+                output[i - p_inizio] = blocco.dati[i];
+            }
+
+        }
+
+        return output;
+    },
+
+}
+
+
+// -=-=-------------------------------------------------------------------=-=-
+// -=-=-------------------------------------------------------------------=-=-
+// -=-=-------------------------------------------------------------------=-=-
+
+
+msx = {
+
+    // -=-=---------------------------------------------------------------=-=-
+    // PARAMETRI GENERALI
+    // -=-=---------------------------------------------------------------=-=-
+
     parametri: {},
+    buffer: blocco,
     conto_bytes: 0,
     sincronismo_lungo: 2500,
     sincronismo_corto: 1500,
     silenzio_lungo: 2500,
     silenzio_corto: 1500,
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    inizializza: function()
+    {
+        msx.audio = new Audio(); // create the HTML5 audio element
+        msx.wave = new RIFFWAVE(); // create an empty wave file
+        msx.data = []; // yes, it's an array
+
+        msx.parametri.blocco_intestazione = new Uint8Array([0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
+                                             0x13, 0x7D, 0x74]);
+
+        msx.parametri.blocco_file_ascii = new Uint8Array([0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
+                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA]);
+        msx.parametri.blocco_file_basic = new Uint8Array([0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
+                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3]);
+        msx.parametri.blocco_file_binario = new Uint8Array([0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0]);
+
+        msx.parametri.frequenza = 28800,  // 19.200hz
+        msx.parametri.bitrate = 2400,  // 1200bps
+        msx.parametri.ampiezza = 0.90,  // 80% dell'ampiezza massima
+
+        msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
+        msx.wave.header.numChannels = 1; // one channels (mono)
+
+        msx.ricalcola_onde()
+
+        /*
+        msx.inserisci_sincronismo(msx.sincronismo_lungo);
+
+        msx.inserisci_array(msx.parametri.blocco_file_ascii);
+        msx.inserisci_stringa("TAPEJS", false);
+
+        msx.inserisci_silenzio(msx.silenzio_corto);
+
+        msx.inserisci_sincronismo(msx.sincronismo_corto);
+
+        msx.inserisci_stringa("10 KEY OFF : CLS");
+        msx.inserisci_stringa("20 PRINT \"----------------------------------\"");
+        msx.inserisci_stringa("30 PRINT \"CIAO A TUTTI BELLI E BRUTTI\"");
+        msx.inserisci_stringa("40 PRINT \"SE RIUSCITE A VEDERE QUESTO MESSAGGIO\"");
+        msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"");
+        msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
+        msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
+
+        msx.inserisci_silenzio(msx.silenzio_corto);
+        msx.inserisci_sincronismo(msx.sincronismo_corto);
+
+        for(i=0;i<255;i++) {
+            msx.inserisci_array([0x1A]); // EOF
+        }
+
+        msx.wave.Make(msx.data); // make the wave file
+        msx.audio.src = msx.wave.dataURI; // set audio source
+
+        */
+    },
 
     // -=-=---------------------------------------------------------------=-=-
 
@@ -134,62 +293,6 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    inizializza: function()
-    {
-        msx.audio = new Audio(); // create the HTML5 audio element
-        msx.wave = new RIFFWAVE(); // create an empty wave file
-        msx.data = []; // yes, it's an array
-
-        msx.parametri.blocco_intestazione = new Uint8Array([0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
-                                             0x13, 0x7D, 0x74]);
-
-        msx.parametri.blocco_file_ascii = new Uint8Array([0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
-                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA]);
-        msx.parametri.blocco_file_basic = new Uint8Array([0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
-                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3]);
-        msx.parametri.blocco_file_binario = new Uint8Array([0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
-                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0]);
-
-        msx.parametri.frequenza = 28800,  // 19.200hz
-        msx.parametri.bitrate = 2400,  // 1200bps
-        msx.parametri.ampiezza = 0.90,  // 80% dell'ampiezza massima
-
-        msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
-        msx.wave.header.numChannels = 1; // one channels (mono)
-
-        msx.ricalcola_onde()
-
-        /*
-        msx.inserisci_sincronismo(msx.sincronismo_lungo);
-
-        msx.inserisci_array(msx.parametri.blocco_file_ascii);
-        msx.inserisci_stringa("TAPEJS", false);
-
-        msx.inserisci_silenzio(msx.silenzio_corto);
-
-        msx.inserisci_sincronismo(msx.sincronismo_corto);
-
-        msx.inserisci_stringa("10 KEY OFF : CLS");
-        msx.inserisci_stringa("20 PRINT \"----------------------------------\"");
-        msx.inserisci_stringa("30 PRINT \"CIAO A TUTTI BELLI E BRUTTI\"");
-        msx.inserisci_stringa("40 PRINT \"SE RIUSCITE A VEDERE QUESTO MESSAGGIO\"");
-        msx.inserisci_stringa("50 PRINT \"SIGNIFICA CHE IL PROGRAMMA FUNZIONA\"");
-        msx.inserisci_stringa("60 PRINT \"----------------------------------\"");
-        msx.inserisci_stringa("70 PLAY \"v15t255cdgbag\"");
-
-        msx.inserisci_silenzio(msx.silenzio_corto);
-        msx.inserisci_sincronismo(msx.sincronismo_corto);
-
-        for(i=0;i<255;i++) {
-            msx.inserisci_array([0x1A]); // EOF
-        }
-
-        msx.wave.Make(msx.data); // make the wave file
-        msx.audio.src = msx.wave.dataURI; // set audio source
-
-        */
-    },
-
     genera_file: function(p_nome, p_tipo, p_dati)
     {
         msx.inserisci_sincronismo(msx.sincronismo_lungo);
@@ -205,87 +308,23 @@ msx = {
     // -=-=---------------------------------------------------------------=-=-
 
     /**
-    Verifica che un blocco di codice sia uguale ad un'altro
-    */
-
-    contiene: function(p_ricerca, p_inizio)
-    {
-        var uguale = true;
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-
-        for(var i = 0; i < p_ricerca.length; i++) {
-            if (msx.p_data[p_inizio + i] !== p_ricerca[i]) {
-                uguale = false;
-                i = p_ricerca.byteLength;
-            }
-        }
-
-        return uguale;
-    },
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    cerca: function(p_ricerca, p_inizio)
-    {
-        var posizione = -1;
-        var trovato = false;
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-
-        var i = p_inizio;
-        while ((i < msx.p_data.byteLength) && (!trovato)) {
-            if (msx.contiene(p_ricerca, i)) {
-                posizione = i;
-                trovato = true;
-            }
-            i++;
-        }
-
-        return posizione;
-    },
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    splitta: function(p_inizio, p_fine)
-    {
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-        if (typeof(p_fine) == "undefined") {
-            p_inizio = msx.p_data.byteLength;
-        }
-
-        output = new Uint8Array(p_fine - p_inizio);
-        for(var i = p_inizio; i < p_fine; i++) {
-            output[i - p_inizio] = msx.p_data[i];
-        }
-
-        return output;
-    },
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    /**
     Carica un file in memoria
     */
     load: function(p_data)
     {
-        msx.p_data = p_data
+        msx.buffer.carica(p_data);
 
         pos = [];
-        pos[0] = msx.cerca(msx.parametri.blocco_intestazione)
-        pos[1] = msx.cerca(msx.parametri.blocco_intestazione, pos[0] + 1)
-        pos[2] = msx.cerca(msx.parametri.blocco_intestazione, pos[1] + 1)
-        pos[3] = msx.cerca(msx.parametri.blocco_intestazione, pos[2] + 1)
-        console.log(pos);
+        pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
+        pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
+        pos[2] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[1] + 1);
+        pos[3] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[2] + 1);
+        //console.log(pos);
 
         msx.blocco = [];
-        msx.blocco[0] = msx.splitta(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1)
-        msx.blocco[1] = msx.splitta(pos[3] + msx.parametri.blocco_intestazione.length, msx.p_data.byteLength)
-        console.log(msx.blocco);
+        msx.blocco[0] = msx.buffer.splitta(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1);
+        msx.blocco[1] = msx.buffer.splitta(pos[3] + msx.parametri.blocco_intestazione.length);
+        //console.log(msx.blocco);
 
         msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
         msx.inserisci_silenzio(msx.silenzio_lungo);

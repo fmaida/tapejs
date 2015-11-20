@@ -1,4 +1,4 @@
-//: Bannerino "Fork me on GitHub"
+//- Bannerino "Fork me on GitHub"
 
 mixin banner_github(p_url)
     a(href=p_url)
@@ -8,26 +8,26 @@ mixin banner_github(p_url)
             data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png")
             
                         
-//: Da qui in poi inizia la pagina web vera e propria
+//- Da qui in poi inizia la pagina web vera e propria
 
 head
     title
         | Tape.js Demonstration
     meta(charset="utf-8")
     
-    //: Carica il foglio di stile css
+    //- Carica il foglio di stile css
     
     link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css", rel="stylesheet", type="text/css")
     link(href="css/style.css", rel="stylesheet", type="text/css")
     
-    //: Carica le librerie in javascript
+    //- Carica le librerie in javascript
     
     script(type="text/javascript", src="js/jquery-1.11.3.min.js")
-    //: script(type="text/javascript", src="https://code.jquery.com/jquery-1.11.3.min.js")        
+    //- script(type="text/javascript", src="https://code.jquery.com/jquery-1.11.3.min.js")        
     script(type="text/javascript", src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js")
-    //: script(type="text/javascript", src="js/FileSaver-min.js")    
-    //: script(type="text/javascript", src="js/riffwave-min.js")
-    //: script(type="text/javascript", src="js/msxtape-min.js")    
+    //- script(type="text/javascript", src="js/FileSaver-min.js")    
+    //- script(type="text/javascript", src="js/riffwave-min.js")
+    //- script(type="text/javascript", src="js/msxtape-min.js")    
     script(type="text/javascript", src="js/FileSaver-min.js")    
     script(type="text/javascript", src="js/riffwave-min.js")
     script(type="text/javascript", src="js/msxtape-min.js")    
@@ -135,7 +135,7 @@ body
                     img#logo(src="img/kaiko_logo.png", alt="Kaiko")
                     
                     
-    //: +banner_github("https://github.com/fmaida/tapejs/")
+    //- +banner_github("https://github.com/fmaida/tapejs/")
     
-    //: script(type="text/javascript", src="js/script-min.js")
+    //- script(type="text/javascript", src="js/script-min.js")
     script(type="text/javascript", src="js/script-min.js")
