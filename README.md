@@ -14,7 +14,7 @@ There's one other thing you have to know before diving into code: at the moment 
 
 ### Dependencies
 
-In order to generate and download a wav file this application makes use of  
+In order to generate and download wav files this application makes use of  
 [riffwave.js](http://codebase.es/riffwave/) by Pedro Ladaria and [FileSaver.js](https://github.com/eligrey/FileSaver.js/) by Eli Grey.
 
 ### Where can I try a demo of this script ?
