@@ -1,3 +1,31 @@
+parametri = {
+
+    blocco_intestazione: new Uint8Array([0x1F, 0xA6, 0xDE, 0xBA,
+                                         0xCC, 0x13, 0x7D, 0x74]),
+
+    blocco_file_ascii: new Uint8Array([0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
+                                       0xEA, 0xEA, 0xEA, 0xEA, 0xEA]),
+    blocco_file_basic: new Uint8Array([0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
+                                       0xD3, 0xD3, 0xD3, 0xD3, 0xD3]),
+    blocco_file_binario: new Uint8Array([0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+                                         0xD0, 0xD0, 0xD0, 0xD0, 0xD0]),
+
+    frequenza: 28800,  // 28.800hz
+    bitrate: 2400,     // 2400bps
+    ampiezza: 0.90,    // 90% dell'ampiezza massima
+
+    sincronismo_lungo: 2500,
+    sincronismo_corto: 1500,
+    silenzio_lungo: 2500,
+    silenzio_corto: 1500
+}
+
+
+// -=-=-------------------------------------------------------------------=-=-
+// -=-=-------------------------------------------------------------------=-=-
+// -=-=-------------------------------------------------------------------=-=-
+
+
 blocco = {
 
     dati: new Uint8Array(),
@@ -102,13 +130,9 @@ msx = {
     // PARAMETRI GENERALI
     // -=-=---------------------------------------------------------------=-=-
 
-    parametri: {},
+    parametri: parametri,
     buffer: blocco,
     conto_bytes: 0,
-    sincronismo_lungo: 2500,
-    sincronismo_corto: 1500,
-    silenzio_lungo: 2500,
-    silenzio_corto: 1500,
 
     // -=-=---------------------------------------------------------------=-=-
 
@@ -117,20 +141,6 @@ msx = {
         msx.audio = new Audio(); // create the HTML5 audio element
         msx.wave = new RIFFWAVE(); // create an empty wave file
         msx.data = []; // yes, it's an array
-
-        msx.parametri.blocco_intestazione = new Uint8Array([0x1F, 0xA6, 0xDE, 0xBA, 0xCC,
-                                             0x13, 0x7D, 0x74]);
-
-        msx.parametri.blocco_file_ascii = new Uint8Array([0xEA, 0xEA, 0xEA, 0xEA, 0xEA,
-                                           0xEA, 0xEA, 0xEA, 0xEA, 0xEA]);
-        msx.parametri.blocco_file_basic = new Uint8Array([0xD3, 0xD3, 0xD3, 0xD3, 0xD3,
-                                           0xD3, 0xD3, 0xD3, 0xD3, 0xD3]);
-        msx.parametri.blocco_file_binario = new Uint8Array([0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
-                                             0xD0, 0xD0, 0xD0, 0xD0, 0xD0]);
-
-        msx.parametri.frequenza = 28800,  // 19.200hz
-        msx.parametri.bitrate = 2400,  // 1200bps
-        msx.parametri.ampiezza = 0.90,  // 90% dell'ampiezza massima
 
         msx.wave.header.sampleRate = msx.parametri.frequenza; // set sample rate to 44KHz
         msx.wave.header.numChannels = 1; // one channels (mono)
@@ -265,14 +275,26 @@ msx = {
 
     genera_file: function(p_nome, p_tipo, p_dati)
     {
-        msx.inserisci_sincronismo(msx.sincronismo_lungo);
+        msx.inserisci_sincronismo(msx.parametri.sincronismo_lungo);
         msx.inserisci_array(p_tipo);
         msx.inserisci_stringa(p_nome);
 
-        msx.inserisci_silenzio(msx.silenzio_corto);
+        msx.inserisci_silenzio(msx.parametri.silenzio_corto);
 
-        msx.inserisci_sincronismo(msx.sincronismo_corto);
+        msx.inserisci_sincronismo(msx.parametri.sincronismo_corto);
         msx.inserisci_array(p_dati);
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    cerca_intestazione: function(p_inizio)
+    {
+        var pos = msx.buffer.cerca(msx.parametri.blocco_intestazione, p_inizio);
+        if (pos >= 0) {
+            return pos;
+        } else {
+            return msx.buffer.byteLength;
+        }
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -304,6 +326,7 @@ msx = {
 
     load2: function()
     {
+
         pos = [];
         pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
         pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
@@ -317,8 +340,33 @@ msx = {
         //console.log(msx.blocco);
 
         msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
-        msx.inserisci_silenzio(msx.silenzio_lungo);
+        msx.inserisci_silenzio(msx.parametri.silenzio_lungo);
         msx.genera_file("GAME  ", msx.parametri.blocco_file_binario, msx.blocco[1]);
+        
+
+        // Ripeti finchè non trova altri blocchi di intestazione...
+        //    Cerca il primo blocco di intestazione
+        //    Cerca il secondo blocco di intestazione...
+        //       ...se non lo trova, il secondo blocco è la fine del buffer
+        //    Guarda i primi dieci bytes per scoprire il tipo di file...
+        //       ...se è un file ASCII, Binario o Basic...
+        //          Cerca il terzo blocco di intestazione...
+        //             ...se non lo trova, il terzo blocco è la fine del buffer
+        //          Altrimenti...
+        //             ...considera tutto fra il 1o ed il 2o blocco -> custom
+
+        /*pos1 = msx.cerca_intestazione();
+        if (pos1 >= 0) {
+            pos1 += msx.parametri.blocco_intestazione.length;
+        }
+        pos2 = msx.cerca_intestazione(pos1 + 1);
+
+        analisi = msx.buffer.splitta(pos1, pos2)
+        console.log(analisi);
+        console.log("E' un file ASCII? " + msx.buffer.contiene(msx.parametri.blocco_file_ascii, pos1));
+        console.log("E' un file Binario? " + msx.buffer.contiene(msx.parametri.blocco_file_binario, pos1));
+        console.log("E' un file Basic? " + msx.buffer.contiene(msx.parametri.blocco_file_basic, pos1));
+        */
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
