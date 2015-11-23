@@ -411,11 +411,18 @@ msx = {
         block_data = msx.buffer.splitta(analisi["begin"], analisi["end"]);
         block_end = analisi["end"];
 
+        if (block_end > block_start) {
+            block_length = block_end - block_start;
+        } else {
+            block_length = -1;
+        }
+        
         return {"name": block_name,
                 "type": block_type,
                 "data": block_data,
                 "begin": block_start,
-                "end": block_end}
+                "end": block_end,
+                "length": block_length}
     },
 
     // -=-=---------------------------------------------------------------=-=-
