@@ -116,6 +116,11 @@ blocco = {
         return output;
     },
 
+    length: function()
+    {
+        return blocco.dati.byteLength;
+    },
+
 }
 
 
@@ -273,28 +278,24 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    genera_file: function(p_nome, p_tipo, p_dati)
+    genera_file: function(p_blocco)
     {
         msx.inserisci_sincronismo(msx.parametri.sincronismo_lungo);
-        msx.inserisci_array(p_tipo);
-        msx.inserisci_stringa(p_nome);
-
-        msx.inserisci_silenzio(msx.parametri.silenzio_corto);
-
-        msx.inserisci_sincronismo(msx.parametri.sincronismo_corto);
-        msx.inserisci_array(p_dati);
-    },
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    cerca_intestazione: function(p_inizio)
-    {
-        var pos = msx.buffer.cerca(msx.parametri.blocco_intestazione, p_inizio);
-        if (pos >= 0) {
-            return pos;
-        } else {
-            return msx.buffer.byteLength;
+        if (p_blocco.type == "ascii") {
+            msx.inserisci_array(msx.parametri.blocco_file_ascii);
+        } else if (p_blocco.type == "basic") {
+            msx.inserisci_array(msx.parametri.blocco_file_basic);
+        } else if (p_blocco.type == "binary") {
+            msx.inserisci_array(msx.parametri.blocco_file_binario);
         }
+
+        if (p_blocco.type != "custom") {
+            msx.inserisci_stringa(p_blocco.name);
+            msx.inserisci_silenzio(msx.parametri.silenzio_corto);
+            msx.inserisci_sincronismo(msx.parametri.sincronismo_corto);
+        }
+
+        msx.inserisci_array(p_blocco.data);
     },
 
     // -=-=---------------------------------------------------------------=-=-
@@ -324,9 +325,104 @@ msx = {
 
     // -=-=---------------------------------------------------------------=-=-
 
+    cerca_blocco: function(p_inizio)
+    {
+        var pos1;
+        var pos2;
+
+        // Cerca la prima intestazione
+        pos1 = msx.buffer.cerca(msx.parametri.blocco_intestazione, p_inizio);
+        // Se la trova..
+        if (pos1 >= 0) {
+            // Sposta pos1 in avanti per evitare di incorporare l'intestazione
+            pos1 += msx.parametri.blocco_intestazione.length;
+            // ..cerca la seconda intestazione
+            pos2 = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos1);
+            // Se trova anche la seconda bene, altrimenti..
+            if (pos2 < 0) {
+                pos2 = msx.buffer.length();
+            }
+        } else {
+            pos1 = p_inizio;
+            pos2 = msx.buffer.length();
+        }
+
+        return {"begin": pos1, "end": pos2}
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    get_block_type: function(p_analisi)
+    {
+        var block_type = "custom";
+        var begin = p_analisi["begin"];
+
+        if (msx.buffer.contiene(msx.parametri.blocco_file_ascii, begin)) {
+            block_type = "ascii";
+        } else if (msx.buffer.contiene(msx.parametri.blocco_file_basic, begin)) {
+            block_type = "basic";
+        } else if (msx.buffer.contiene(msx.parametri.blocco_file_binario, begin)) {
+            block_type = "binary";
+        }
+
+        return block_type;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    get_block_name: function(p_analisi)
+    {
+        var array_block = [];
+        var block_name = "";
+        var begin = p_analisi["begin"];
+
+        array_block = msx.buffer.splitta(p_analisi["begin"]
+                                        + msx.parametri.blocco_file_ascii.length,
+                                        p_analisi["end"]);
+
+        for(var i=0; i < array_block.byteLength; i++) {
+            block_name += String.fromCharCode(array_block[i]);
+        }
+
+        return block_name;
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
+    estrai_blocco: function(p_inizio)
+    {
+        var block_name = "";
+        var block_type = "";
+        var block_data = new Uint8Array();
+        var block_start;
+        var block_end;
+        var analisi;
+
+        analisi = msx.cerca_blocco(p_inizio);
+        block_start = analisi["begin"];
+        block_type = msx.get_block_type(analisi);
+        if (block_type != "custom") {
+            block_name = msx.get_block_name(analisi);
+        }
+
+        if (block_type != "custom") {
+            analisi = msx.cerca_blocco(analisi["end"]);
+        }
+        block_data = msx.buffer.splitta(analisi["begin"], analisi["end"]);
+        block_end = analisi["end"];
+
+        return {"name": block_name,
+                "type": block_type,
+                "data": block_data,
+                "begin": block_start,
+                "end": block_end}
+    },
+
+    // -=-=---------------------------------------------------------------=-=-
+
     load2: function()
     {
-
+        /*
         pos = [];
         pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
         pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
@@ -342,7 +438,7 @@ msx = {
         msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
         msx.inserisci_silenzio(msx.parametri.silenzio_lungo);
         msx.genera_file("GAME  ", msx.parametri.blocco_file_binario, msx.blocco[1]);
-        
+        */
 
         // Ripeti finchè non trova altri blocchi di intestazione...
         //    Cerca il primo blocco di intestazione
@@ -355,18 +451,19 @@ msx = {
         //          Altrimenti...
         //             ...considera tutto fra il 1o ed il 2o blocco -> custom
 
-        /*pos1 = msx.cerca_intestazione();
-        if (pos1 >= 0) {
-            pos1 += msx.parametri.blocco_intestazione.length;
-        }
-        pos2 = msx.cerca_intestazione(pos1 + 1);
+        var pos = 0;
+        var block;
 
-        analisi = msx.buffer.splitta(pos1, pos2)
-        console.log(analisi);
-        console.log("E' un file ASCII? " + msx.buffer.contiene(msx.parametri.blocco_file_ascii, pos1));
-        console.log("E' un file Binario? " + msx.buffer.contiene(msx.parametri.blocco_file_binario, pos1));
-        console.log("E' un file Basic? " + msx.buffer.contiene(msx.parametri.blocco_file_basic, pos1));
-        */
+        block1 = msx.estrai_blocco(pos);
+        block2 = msx.estrai_blocco(block1.end);
+
+        console.log(block1);
+        console.log(block2);
+
+        msx.genera_file(block1);
+        msx.inserisci_silenzio(msx.parametri.silenzio_lungo);
+        msx.genera_file(block2);
+
 
         msx.wave.Make(msx.data); // make the wave file
         msx.audio.src = msx.wave.dataURI; // set audio source
