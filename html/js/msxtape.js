@@ -381,6 +381,7 @@ var MSX = (function () {
                 block2 = this.cerca_blocco(block1.get_data_end());
                 // console.log(block2);
                 if (block2 !== null) {
+                    // Merge the two blocks
                     block1.append_block(block2);
                 }
             }
