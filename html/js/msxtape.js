@@ -376,14 +376,12 @@ var MSX = (function () {
         var block2;
         block1 = this.cerca_blocco(p_inizio);
         if (block1 !== null) {
-            console.log(block1);
+            // console.log(block1);
             if (!block1.is_custom()) {
                 block2 = this.cerca_blocco(block1.get_data_end());
-                console.log(block2);
+                // console.log(block2);
                 if (block2 !== null) {
                     block1.append_block(block2);
-                    console.log(block1);
-                    console.log("-------------------------------");
                 }
             }
         }
