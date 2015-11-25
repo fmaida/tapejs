@@ -1,4 +1,4 @@
-class Block {
+class Buffer {
 
     private dati:Uint8Array;
 
@@ -41,7 +41,7 @@ class Block {
         if (typeof(p_inizio) == "undefined") {
             p_inizio = 0;
         }
-        
+
         var i = p_inizio;
         while ((i < this.dati.byteLength) && (!trovato)) {
             if (this.contiene(p_ricerca, i)) {

@@ -1,16 +1,7 @@
 ///<reference path="lib/riffwave.js.d.ts"/>
 ///<reference path="./parameters.ts"/>
-///<reference path="./block.ts"/>
-
-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-
-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
+///<reference path="./buffer.ts"/>
+///<reference path="./datablock.ts"/>
 
 
 class MSX {
@@ -19,7 +10,7 @@ class MSX {
     // PARAMETRI GENERALI
     // -=-=---------------------------------------------------------------=-=-
     private parametri:Parameters;
-    private buffer:Block;
+    private buffer:Buffer;
     private audio;
     private wave;
     private data;
@@ -27,7 +18,7 @@ class MSX {
     constructor()
     {
         this.parametri = new Parameters();
-        this.buffer = new Block();
+        this.buffer = new Buffer();
 
         this.audio = new Audio(); // create the HTML5 audio element
         this.wave = new RIFFWAVE(); // create an empty wave file
@@ -37,6 +28,7 @@ class MSX {
         this.wave.header.numChannels = 1; // one channels (mono)
 
         this.ricalcola_onde();
+        DataBlock.parametri = this.parametri;
     }
 
     // -=-=---------------------------------------------------------------=-=-
@@ -218,129 +210,58 @@ class MSX {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    cerca_blocco(p_inizio)
+    cerca_blocco(p_inizio): DataBlock
     {
-        var pos1;
-        var pos2;
+        let pos1:number;
+        let pos2:number;
+        let block:DataBlock = null;
 
         // Cerca la prima intestazione
         pos1 = this.buffer.cerca(this.parametri.blocco_intestazione, p_inizio);
-        // Se la trova..
         if (pos1 >= 0) {
-            // Sposta pos1 in avanti per evitare di incorporare l'intestazione
             pos1 += this.parametri.blocco_intestazione.length;
-            // ..cerca la seconda intestazione
             pos2 = this.buffer.cerca(this.parametri.blocco_intestazione, pos1);
-            // Se trova anche la seconda bene, altrimenti..
             if (pos2 < 0) {
                 pos2 = this.buffer.length();
             }
+            block = new DataBlock(this.buffer.splitta(pos1, pos2));
+            block.set_data_begin(pos1);
+            block.set_data_end(pos2);
         } else {
-            pos1 = p_inizio;
-            pos2 = this.buffer.length();
+            // Non ha trovato nemmeno un blocco intestazione
         }
 
-        return {"begin": pos1, "end": pos2}
+        return block;
     }
 
     // -=-=---------------------------------------------------------------=-=-
 
-    get_block_type(p_analisi)
+    estrai_blocco(p_inizio):DataBlock
     {
-        var block_type = "custom";
-        var begin = p_analisi["begin"];
+        var block1:DataBlock;
+        var block2:DataBlock;
 
-        if (this.buffer.contiene(this.parametri.blocco_file_ascii, begin)) {
-            block_type = "ascii";
-        } else if (this.buffer.contiene(this.parametri.blocco_file_basic, begin)) {
-            block_type = "basic";
-        } else if (this.buffer.contiene(this.parametri.blocco_file_binario, begin)) {
-            block_type = "binary";
+        block1 = this.cerca_blocco(p_inizio);
+        if (block1 !== null) {
+            console.log(block1);
+            if (!block1.is_custom()) {
+                block2 = this.cerca_blocco(block1.get_data_end());
+                console.log(block2);
+                if(block2 !== null) {
+                    block1.append_block(block2);
+                    console.log(block1);
+                    console.log("-------------------------------");
+                }
+            }
         }
 
-        return block_type;
-    }
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    get_block_name(p_analisi)
-    {
-        var array_block:Uint8Array;
-        var block_name = "";
-        var begin = p_analisi["begin"];
-
-        array_block = this.buffer.splitta(p_analisi["begin"]
-                                        + this.parametri.blocco_file_ascii.length,
-                                        p_analisi["end"]);
-
-        for(var i=0; i < array_block.byteLength; i++) {
-            block_name += String.fromCharCode(array_block[i]);
-        }
-
-        return block_name;
-    }
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    estrai_blocco(p_inizio)
-    {
-        var block_name = "";
-        var block_type = "";
-        var block_data: Uint8Array;
-        var block_start: number;
-        var block_end: number;
-        var block_length: number;
-        var analisi;
-
-        analisi = this.cerca_blocco(p_inizio);
-        block_start = analisi["begin"];
-        block_type = this.get_block_type(analisi);
-        if (block_type != "custom") {
-            block_name = this.get_block_name(analisi);
-        }
-
-        if (block_type != "custom") {
-            analisi = this.cerca_blocco(analisi["end"]);
-        }
-        block_data = this.buffer.splitta(analisi["begin"], analisi["end"]);
-        block_end = analisi["end"];
-
-        if (block_end > block_start) {
-            block_length = block_end - block_start;
-        } else {
-            block_length = -1;
-        }
-
-        return {"name": block_name,
-                "type": block_type,
-                "data": block_data,
-                "begin": block_start,
-                "end": block_end,
-                "length": block_length}
+        return block1;
     }
 
     // -=-=---------------------------------------------------------------=-=-
 
     load2()
     {
-        /*
-        pos = [];
-        pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
-        pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
-        pos[2] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[1] + 1);
-        pos[3] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[2] + 1);
-        //console.log(pos);
-
-        msx.blocco = [];
-        msx.blocco[0] = msx.buffer.splitta(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1);
-        msx.blocco[1] = msx.buffer.splitta(pos[3] + msx.parametri.blocco_intestazione.length);
-        //console.log(msx.blocco);
-
-        msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
-        msx.inserisci_silenzio(msx.parametri.silenzio_lungo);
-        msx.genera_file("GAME  ", msx.parametri.blocco_file_binario, msx.blocco[1]);
-        */
-
         // Ripeti finchè non trova altri blocchi di intestazione...
         //    Cerca il primo blocco di intestazione
         //    Cerca il secondo blocco di intestazione...
@@ -357,7 +278,7 @@ class MSX {
         var block2;
 
         block1 = this.estrai_blocco(pos);
-        block2 = this.estrai_blocco(block1.end);
+        block2 = this.estrai_blocco(block1.get_data_end());
 
         console.log(block1);
         console.log(block2);
@@ -372,4 +293,4 @@ class MSX {
     }
 }
 
-var mioMSX = new MSX();
+// var mioMSX = new MSX();

@@ -18,18 +18,18 @@ var Parameters = (function () {
     }
     return Parameters;
 })();
-var Block = (function () {
-    function Block() {
+var Buffer = (function () {
+    function Buffer() {
     }
     // -=-=---------------------------------------------------------------=-=-
-    Block.prototype.carica = function (p_dati) {
+    Buffer.prototype.carica = function (p_dati) {
         this.dati = p_dati;
     };
     // -=-=---------------------------------------------------------------=-=-
     /**
     Verifica che un blocco di codice sia uguale ad un'altro
     */
-    Block.prototype.contiene = function (p_ricerca, p_inizio) {
+    Buffer.prototype.contiene = function (p_ricerca, p_inizio) {
         var uguale = true;
         if (typeof (p_inizio) == "undefined") {
             p_inizio = 0;
@@ -43,7 +43,7 @@ var Block = (function () {
         return uguale;
     };
     // -=-=---------------------------------------------------------------=-=-
-    Block.prototype.cerca = function (p_ricerca, p_inizio) {
+    Buffer.prototype.cerca = function (p_ricerca, p_inizio) {
         var posizione = -1;
         var trovato = false;
         if (typeof (p_inizio) == "undefined") {
@@ -60,7 +60,7 @@ var Block = (function () {
         return posizione;
     };
     // -=-=---------------------------------------------------------------=-=-
-    Block.prototype.splitta = function (p_inizio, p_fine) {
+    Buffer.prototype.splitta = function (p_inizio, p_fine) {
         var output;
         if (typeof (p_inizio) == "undefined") {
             p_inizio = 0;
@@ -83,30 +83,131 @@ var Block = (function () {
         }
         return output;
     };
-    Block.prototype.length = function () {
+    Buffer.prototype.length = function () {
         return this.dati.byteLength;
     };
-    return Block;
+    return Buffer;
+})();
+///<reference path="./parameters.ts"/>
+var DataBlock = (function () {
+    function DataBlock(p_data) {
+        if (p_data === void 0) { p_data = null; }
+        if (p_data !== null)
+            this.set_data(p_data);
+    }
+    DataBlock.prototype.set_name = function (p_name) {
+        if (p_name.length > 6) {
+            p_name = p_name.substring(0, 6);
+        }
+        this.name = p_name;
+    };
+    DataBlock.prototype.get_name = function () {
+        return this.name;
+    };
+    DataBlock.prototype.set_type = function (p_type) {
+        this.type = p_type;
+    };
+    DataBlock.prototype.get_type = function () {
+        return this.type;
+    };
+    DataBlock.prototype.is_custom = function () {
+        return (this.type == "custom");
+    };
+    DataBlock.prototype.set_data = function (p_data) {
+        this.data = p_data;
+        this.type = this.analyze_block_type();
+        if (!this.is_custom()) {
+            this.set_name(this.analyze_block_name());
+            var temp = new Uint8Array(p_data.byteLength - 16);
+            for (var i = 16; i < p_data.byteLength; i++) {
+                temp[i - 16] = p_data[i];
+            }
+            this.data = temp;
+        }
+    };
+    DataBlock.prototype.append_block = function (p_block) {
+        var data = new Uint8Array(this.data.byteLength + p_block.data.byteLength);
+        var offset = 0;
+        for (var i = 0; i < this.data.byteLength; i++) {
+            data[offset + i] = this.data[i];
+        }
+        offset += this.data.byteLength;
+        for (var i = 0; i < p_block.data.byteLength; i++) {
+            data[offset + i] = p_block.data[i];
+        }
+        this.data = data;
+        this.set_data_end(p_block.get_data_end());
+    };
+    DataBlock.prototype.contains = function (p_pattern) {
+        var match = true;
+        for (var i = 0; i < p_pattern.length; i++) {
+            if (this.data[i] !== p_pattern[i]) {
+                match = false;
+                i = p_pattern.byteLength;
+            }
+        }
+        return match;
+    };
+    DataBlock.prototype.analyze_block_type = function () {
+        var block_type = "custom";
+        if (this.contains(DataBlock.parametri.blocco_file_ascii)) {
+            block_type = "ascii";
+        }
+        else if (this.contains(DataBlock.parametri.blocco_file_basic)) {
+            block_type = "basic";
+        }
+        else if (this.contains(DataBlock.parametri.blocco_file_binario)) {
+            block_type = "binary";
+        }
+        return block_type;
+    };
+    DataBlock.prototype.analyze_block_name = function () {
+        var block_name = "";
+        var begin = 10;
+        for (var i = begin; i < begin + 6; i++) {
+            block_name += String.fromCharCode(this.data[i]);
+        }
+        return block_name;
+    };
+    DataBlock.prototype.get_data = function () {
+        return this.data;
+    };
+    DataBlock.prototype.set_data_begin = function (p_value) {
+        this.data_begin = p_value;
+    };
+    DataBlock.prototype.get_data_begin = function () {
+        return this.data_begin;
+    };
+    DataBlock.prototype.set_data_end = function (p_value) {
+        this.data_end = p_value;
+    };
+    DataBlock.prototype.get_data_end = function () {
+        return this.data_end;
+    };
+    DataBlock.prototype.get_data_length = function () {
+        var length = this.data_end - this.data_begin;
+        if (length < 0) {
+            length = -1;
+        }
+        return length;
+    };
+    return DataBlock;
 })();
 ///<reference path="lib/riffwave.js.d.ts"/>
 ///<reference path="./parameters.ts"/>
-///<reference path="./block.ts"/>
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
-// -=-=-------------------------------------------------------------------=-=-
+///<reference path="./buffer.ts"/>
+///<reference path="./datablock.ts"/>
 var MSX = (function () {
     function MSX() {
         this.parametri = new Parameters();
-        this.buffer = new Block();
+        this.buffer = new Buffer();
         this.audio = new Audio(); // create the HTML5 audio element
         this.wave = new RIFFWAVE(); // create an empty wave file
         this.data = []; // yes, it's an array
         this.wave.header.sampleRate = this.parametri.frequenza; // set sample rate to 44KHz
         this.wave.header.numChannels = 1; // one channels (mono)
         this.ricalcola_onde();
+        DataBlock.parametri = this.parametri;
     }
     // -=-=---------------------------------------------------------------=-=-
     MSX.prototype.ricalcola_onde = function () {
@@ -252,104 +353,44 @@ var MSX = (function () {
     MSX.prototype.cerca_blocco = function (p_inizio) {
         var pos1;
         var pos2;
+        var block = null;
         // Cerca la prima intestazione
         pos1 = this.buffer.cerca(this.parametri.blocco_intestazione, p_inizio);
-        // Se la trova..
         if (pos1 >= 0) {
-            // Sposta pos1 in avanti per evitare di incorporare l'intestazione
             pos1 += this.parametri.blocco_intestazione.length;
-            // ..cerca la seconda intestazione
             pos2 = this.buffer.cerca(this.parametri.blocco_intestazione, pos1);
-            // Se trova anche la seconda bene, altrimenti..
             if (pos2 < 0) {
                 pos2 = this.buffer.length();
             }
+            block = new DataBlock(this.buffer.splitta(pos1, pos2));
+            block.set_data_begin(pos1);
+            block.set_data_end(pos2);
         }
         else {
-            pos1 = p_inizio;
-            pos2 = this.buffer.length();
         }
-        return { "begin": pos1, "end": pos2 };
-    };
-    // -=-=---------------------------------------------------------------=-=-
-    MSX.prototype.get_block_type = function (p_analisi) {
-        var block_type = "custom";
-        var begin = p_analisi["begin"];
-        if (this.buffer.contiene(this.parametri.blocco_file_ascii, begin)) {
-            block_type = "ascii";
-        }
-        else if (this.buffer.contiene(this.parametri.blocco_file_basic, begin)) {
-            block_type = "basic";
-        }
-        else if (this.buffer.contiene(this.parametri.blocco_file_binario, begin)) {
-            block_type = "binary";
-        }
-        return block_type;
-    };
-    // -=-=---------------------------------------------------------------=-=-
-    MSX.prototype.get_block_name = function (p_analisi) {
-        var array_block;
-        var block_name = "";
-        var begin = p_analisi["begin"];
-        array_block = this.buffer.splitta(p_analisi["begin"]
-            + this.parametri.blocco_file_ascii.length, p_analisi["end"]);
-        for (var i = 0; i < array_block.byteLength; i++) {
-            block_name += String.fromCharCode(array_block[i]);
-        }
-        return block_name;
+        return block;
     };
     // -=-=---------------------------------------------------------------=-=-
     MSX.prototype.estrai_blocco = function (p_inizio) {
-        var block_name = "";
-        var block_type = "";
-        var block_data;
-        var block_start;
-        var block_end;
-        var block_length;
-        var analisi;
-        analisi = this.cerca_blocco(p_inizio);
-        block_start = analisi["begin"];
-        block_type = this.get_block_type(analisi);
-        if (block_type != "custom") {
-            block_name = this.get_block_name(analisi);
+        var block1;
+        var block2;
+        block1 = this.cerca_blocco(p_inizio);
+        if (block1 !== null) {
+            console.log(block1);
+            if (!block1.is_custom()) {
+                block2 = this.cerca_blocco(block1.get_data_end());
+                console.log(block2);
+                if (block2 !== null) {
+                    block1.append_block(block2);
+                    console.log(block1);
+                    console.log("-------------------------------");
+                }
+            }
         }
-        if (block_type != "custom") {
-            analisi = this.cerca_blocco(analisi["end"]);
-        }
-        block_data = this.buffer.splitta(analisi["begin"], analisi["end"]);
-        block_end = analisi["end"];
-        if (block_end > block_start) {
-            block_length = block_end - block_start;
-        }
-        else {
-            block_length = -1;
-        }
-        return { "name": block_name,
-            "type": block_type,
-            "data": block_data,
-            "begin": block_start,
-            "end": block_end,
-            "length": block_length };
+        return block1;
     };
     // -=-=---------------------------------------------------------------=-=-
     MSX.prototype.load2 = function () {
-        /*
-        pos = [];
-        pos[0] = msx.buffer.cerca(msx.parametri.blocco_intestazione);
-        pos[1] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[0] + 1);
-        pos[2] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[1] + 1);
-        pos[3] = msx.buffer.cerca(msx.parametri.blocco_intestazione, pos[2] + 1);
-        //console.log(pos);
-
-        msx.blocco = [];
-        msx.blocco[0] = msx.buffer.splitta(pos[1] + msx.parametri.blocco_intestazione.length, pos[2] - 1);
-        msx.blocco[1] = msx.buffer.splitta(pos[3] + msx.parametri.blocco_intestazione.length);
-        //console.log(msx.blocco);
-
-        msx.genera_file("ROAD  ", msx.parametri.blocco_file_ascii, msx.blocco[0]);
-        msx.inserisci_silenzio(msx.parametri.silenzio_lungo);
-        msx.genera_file("GAME  ", msx.parametri.blocco_file_binario, msx.blocco[1]);
-        */
         // Ripeti finchè non trova altri blocchi di intestazione...
         //    Cerca il primo blocco di intestazione
         //    Cerca il secondo blocco di intestazione...
@@ -364,7 +405,7 @@ var MSX = (function () {
         var block1;
         var block2;
         block1 = this.estrai_blocco(pos);
-        block2 = this.estrai_blocco(block1.end);
+        block2 = this.estrai_blocco(block1.get_data_end());
         console.log(block1);
         console.log(block2);
         this.genera_file(block1);
@@ -375,5 +416,5 @@ var MSX = (function () {
     };
     return MSX;
 })();
-var mioMSX = new MSX();
+// var mioMSX = new MSX();
 //# sourceMappingURL=msxtape.js.map
