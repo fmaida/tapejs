@@ -2,24 +2,13 @@
 $(document).ready(function(){
 
     var riproduci = false;
+    msx = new MSX();
 
 
     // Cambia il testo nel pulsante
     $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
 
-    /*
-    // Dice a jQuery di utilizzare la codifica ASCII per trasferire i files
-    $.ajaxSetup({
-    'beforeSend' : function(xhr) {
-        xhr.overrideMimeType('binary');
-    }});
-
-    $(document).load("example/roadf.cas", "", function(p_data) {
-        msx.load(p_data);
-    });
-    */
-
-    msx.load("example/roadf.cas");    
+    msx.load("example/roadf.cas");
 
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button#esegui").click(function() {

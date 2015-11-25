@@ -2,6 +2,7 @@
 $(document).ready(function(){
 
     var riproduci = false;
+    msx = new MSX();
 
 
     // Cambia il testo nel pulsante
