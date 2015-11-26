@@ -11,21 +11,18 @@ class Buffer {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    /**
-    Verifica che un blocco di codice sia uguale ad un'altro
-    */
-    contiene(p_ricerca, p_inizio)
-    {
-        var uguale = true;
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
 
-        for(var i = 0; i < p_ricerca.length; i++) {
+    contiene(p_ricerca:Uint8Array, p_inizio:number = 0):boolean
+    {
+        let i:number = 0;
+        let uguale:boolean = true;
+
+        // Finchè il contenuto è uguale continua a verificare
+        while ((i < p_ricerca.byteLength) && (uguale)) {
             if (this.dati[p_inizio + i] !== p_ricerca[i]) {
                 uguale = false;
-                i = p_ricerca.byteLength;
             }
+            i++;
         }
 
         return uguale;
@@ -33,14 +30,10 @@ class Buffer {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    cerca(p_ricerca, p_inizio)
+    cerca(p_ricerca:Uint8Array, p_inizio:number = 0)
     {
-        var posizione = -1;
-        var trovato = false;
-
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
+        var posizione:number = -1;
+        var trovato:boolean = false;
 
         var i = p_inizio;
         while ((i < this.dati.byteLength) && (!trovato)) {
@@ -56,19 +49,14 @@ class Buffer {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    splitta(p_inizio, p_fine)
+    splitta(p_inizio:number = 0, p_fine:number = this.dati.byteLength)
     {
         var output:Uint8Array;
 
 
-        if (typeof(p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-        if (typeof(p_fine) == "undefined") {
-            p_fine = this.dati.byteLength;
-        }
-
         output = new Uint8Array(p_fine - p_inizio);
+
+        // Il browser su cui gira il programma supporta Uint8Array.slice ?
 
         if (typeof(this.dati.slice) != "undefined") {
 
@@ -79,8 +67,8 @@ class Buffer {
 
         } else {
 
-            // Se il browser non supporta il metodo "slice",
-            // lo fa a manina da codice
+            // Se il browser non supporta il metodo "slice"
+            // (come ad esempio Safari 9) lo fa a manina da codice
 
             for(var i = p_inizio; i < p_fine; i++) {
                 output[i - p_inizio] = this.dati[i];
@@ -91,6 +79,8 @@ class Buffer {
         return output;
     }
 
+    // -=-=---------------------------------------------------------------=-=-
+    
     length()
     {
         return this.dati.byteLength;

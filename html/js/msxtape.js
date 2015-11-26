@@ -26,29 +26,24 @@ var Buffer = (function () {
         this.dati = p_dati;
     };
     // -=-=---------------------------------------------------------------=-=-
-    /**
-    Verifica che un blocco di codice sia uguale ad un'altro
-    */
     Buffer.prototype.contiene = function (p_ricerca, p_inizio) {
+        if (p_inizio === void 0) { p_inizio = 0; }
+        var i = 0;
         var uguale = true;
-        if (typeof (p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-        for (var i = 0; i < p_ricerca.length; i++) {
+        // Finchè il contenuto è uguale continua a verificare
+        while ((i < p_ricerca.byteLength) && (uguale)) {
             if (this.dati[p_inizio + i] !== p_ricerca[i]) {
                 uguale = false;
-                i = p_ricerca.byteLength;
             }
+            i++;
         }
         return uguale;
     };
     // -=-=---------------------------------------------------------------=-=-
     Buffer.prototype.cerca = function (p_ricerca, p_inizio) {
+        if (p_inizio === void 0) { p_inizio = 0; }
         var posizione = -1;
         var trovato = false;
-        if (typeof (p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
         var i = p_inizio;
         while ((i < this.dati.byteLength) && (!trovato)) {
             if (this.contiene(p_ricerca, i)) {
@@ -61,28 +56,26 @@ var Buffer = (function () {
     };
     // -=-=---------------------------------------------------------------=-=-
     Buffer.prototype.splitta = function (p_inizio, p_fine) {
+        if (p_inizio === void 0) { p_inizio = 0; }
+        if (p_fine === void 0) { p_fine = this.dati.byteLength; }
         var output;
-        if (typeof (p_inizio) == "undefined") {
-            p_inizio = 0;
-        }
-        if (typeof (p_fine) == "undefined") {
-            p_fine = this.dati.byteLength;
-        }
         output = new Uint8Array(p_fine - p_inizio);
+        // Il browser su cui gira il programma supporta Uint8Array.slice ?
         if (typeof (this.dati.slice) != "undefined") {
             // Se il browser su cui sta girando lo script supporta
             // il metodo "slice" su di un'array Uint8Array, lo usa
             output = this.dati.slice(p_inizio, p_fine);
         }
         else {
-            // Se il browser non supporta il metodo "slice",
-            // lo fa a manina da codice
+            // Se il browser non supporta il metodo "slice"
+            // (come ad esempio Safari 9) lo fa a manina da codice
             for (var i = p_inizio; i < p_fine; i++) {
                 output[i - p_inizio] = this.dati[i];
             }
         }
         return output;
     };
+    // -=-=---------------------------------------------------------------=-=-
     Buffer.prototype.length = function () {
         return this.dati.byteLength;
     };
