@@ -42,9 +42,9 @@ var Buffer = (function () {
     // -=-=---------------------------------------------------------------=-=-
     Buffer.prototype.cerca = function (p_ricerca, p_inizio) {
         if (p_inizio === void 0) { p_inizio = 0; }
+        var i = p_inizio;
         var posizione = -1;
         var trovato = false;
-        var i = p_inizio;
         while ((i < this.dati.byteLength) && (!trovato)) {
             if (this.contiene(p_ricerca, i)) {
                 posizione = i;

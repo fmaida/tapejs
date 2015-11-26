@@ -17,6 +17,7 @@ class Buffer {
         let i:number = 0;
         let uguale:boolean = true;
 
+
         // Finchè il contenuto è uguale continua a verificare
         while ((i < p_ricerca.byteLength) && (uguale)) {
             if (this.dati[p_inizio + i] !== p_ricerca[i]) {
@@ -30,12 +31,13 @@ class Buffer {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    cerca(p_ricerca:Uint8Array, p_inizio:number = 0)
+    cerca(p_ricerca:Uint8Array, p_inizio:number = 0):number
     {
-        var posizione:number = -1;
-        var trovato:boolean = false;
+        let i:number = p_inizio;
+        let posizione:number = -1;
+        let trovato:boolean = false;
 
-        var i = p_inizio;
+
         while ((i < this.dati.byteLength) && (!trovato)) {
             if (this.contiene(p_ricerca, i)) {
                 posizione = i;
@@ -49,9 +51,9 @@ class Buffer {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    splitta(p_inizio:number = 0, p_fine:number = this.dati.byteLength)
+    splitta(p_inizio:number = 0, p_fine:number = this.dati.byteLength):Uint8Array
     {
-        var output:Uint8Array;
+        let output:Uint8Array;
 
 
         output = new Uint8Array(p_fine - p_inizio);
@@ -70,7 +72,7 @@ class Buffer {
             // Se il browser non supporta il metodo "slice"
             // (come ad esempio Safari 9) lo fa a manina da codice
 
-            for(var i = p_inizio; i < p_fine; i++) {
+            for(let i = p_inizio; i < p_fine; i++) {
                 output[i - p_inizio] = this.dati[i];
             }
 
@@ -80,8 +82,8 @@ class Buffer {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-    
-    length()
+
+    length():number
     {
         return this.dati.byteLength;
     }
