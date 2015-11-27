@@ -97,8 +97,8 @@ class MSX {
     	this.inserisci_bit(0);
 
         // Otto bit di dati
-        var ind;
-        for(ind = 0; ind < 8; ind++) {
+
+        for(let i = 0; i < 8; i++) {
     		if ((p_byte & 1) == 0) {
     			this.inserisci_bit(0);
     		} else {
