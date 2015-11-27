@@ -22,10 +22,23 @@ var Buffer = (function () {
     function Buffer() {
     }
     // -=-=---------------------------------------------------------------=-=-
+    /**
+     * Carica il buffer
+     *
+     * @param p_dati
+     */
     Buffer.prototype.carica = function (p_dati) {
         this.dati = p_dati;
     };
     // -=-=---------------------------------------------------------------=-=-
+    /**
+     * Verifica se il buffer contiene una sottostringa specificata alla
+     * posizione specificata
+     *
+     * @param p_ricerca     La sottostringa da ricercare
+     * @param p_inizio      La posizione da cui cercare
+     * @returns {boolean}   Restituisce True se ha trovato la sottostringa
+     */
     Buffer.prototype.contiene = function (p_ricerca, p_inizio) {
         if (p_inizio === void 0) { p_inizio = 0; }
         var i = 0;
