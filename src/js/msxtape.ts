@@ -1,11 +1,12 @@
-///<reference path="lib/riffwave.js.d.ts"/>
+///<reference path="./lib/riffwave.js.d.ts"/>
 ///<reference path="./parameters.ts"/>
 ///<reference path="./buffer.ts"/>
 ///<reference path="./datablock.ts"/>
 
 
 class MSX {
-
+    // TODO: sdfsdfsfs
+    
     // -=-=---------------------------------------------------------------=-=-
     // PARAMETRI GENERALI
     // -=-=---------------------------------------------------------------=-=-
@@ -91,7 +92,7 @@ class MSX {
     /**
      * Inserisce un bit all'interno del file audio come forma d'onda
      */
-    inserisci_bit(p_bit)
+    inserisci_bit(p_bit:number)
     {
         var i = 0;
         var par = this.parametri;
@@ -289,6 +290,9 @@ class MSX {
 
     // -=-=---------------------------------------------------------------=-=-
 
+    /**
+     * Estrae un blocco dal buffer
+     */
     estrai_blocco(p_inizio):DataBlock
     {
         var block1:DataBlock;
@@ -327,20 +331,20 @@ class MSX {
         //          Altrimenti...
         //             ...considera tutto fra il 1o ed il 2o blocco -> custom
 
-        var pos = 0;
-        var block1;
-        var block2;
+        var pos:number = 0;
+        var block:DataBlock;        
 
-        block1 = this.estrai_blocco(pos);
-        block2 = this.estrai_blocco(block1.get_data_end());
-
-        console.log(block1);
-        console.log(block2);
-
-        this.genera_file(block1);
-        this.inserisci_silenzio(this.parametri.silenzio_lungo);
-        this.genera_file(block2);
-
+        while(block !== null) {
+            if (pos !== 0) {
+                this.inserisci_silenzio(this.parametri.silenzio_lungo);
+            }
+            block = this.estrai_blocco(pos);
+            if(block !== null) {
+                this.genera_file(block);   
+                console.log(block);         
+                pos = block.get_data_end();
+            }            
+        }
 
         this.wave.Make(this.data); // make the wave file
         this.audio.src = this.wave.dataURI; // set audio source

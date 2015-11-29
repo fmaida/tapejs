@@ -1,14 +1,17 @@
+///<reference path="./typings/jquery/jquery.d.ts"/>
+///<reference path="./msxtape.ts"/>
+
 // Esegui quando la pagina viene caricata
 $(document).ready(function(){
 
     var riproduci = false;
-    msx = new MSX();
+    var msx = new MSX();
 
 
     // Cambia il testo nel pulsante
     $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
 
-    msx.load("example/roadf.cas");
+    msx.load("example/pacmania.cas");
 
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button#esegui").click(function() {
