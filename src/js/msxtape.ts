@@ -15,6 +15,9 @@ class MSX {
     private wave;
     private data;
 
+    /** 
+     * Costruttore della classe
+     */
     constructor()
     {
         this.parametri = new Parameters();
@@ -32,9 +35,15 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-
+    
+    /**
+     * Ricalcola tutte le forme d'onda da utilizzare per inserire gli zeri 
+     * e gli uno in base al bitrate deciso per il file (1200bps/2400bps/...) 
+     * ed alla frequenza del file di output decisa.
+     */
     ricalcola_onde()
     {
+        // Scorciatoia per accedere prima ai parametri
         var par = this.parametri;
 
         par.campionamenti = par.frequenza / par.bitrate;
@@ -44,16 +53,22 @@ class MSX {
         let min:number = 255 - max;
         let i:number;
         let temp:Array<number> = [];
-
+        
+        /**
+         * Ricalcola la forma d'onda per rappresentare un bit a 0
+         * Per fare uno zero ci vuole una forma d'onda alla 
+         * frequenza desiderata. Es: Se trasmetto a 2400bps 
+         * l'onda per rappresentare lo 0 deve essere a 2400 
+         */
         for(i = 0; i < passo * 2; i++) temp.push(min);
         for(let i = 0; i < passo * 2; i++) temp.push(max);
         par.wave_bit_0 = new Uint8Array(temp);
 
-        // Ricalcola la forma d'onda per rappresentare un bit a 1
-        // Per fare un 1 ci vogliono due forme d'onda al doppio
-        // della frequenza. Es: se trasmetto a 2400bps le onde per
-        // rappresentare l'1 devono essere a 4800.
-
+        /* Ricalcola la forma d'onda per rappresentare un bit a 1
+         * Per fare un 1 ci vogliono due forme d'onda al doppio
+         * della frequenza. Es: se trasmetto a 2400bps le onde per
+         * rappresentare l'1 devono essere a 4800.
+         */
         temp = [];
         for(i = 0; i < passo; i++) temp.push(min);
         for(i = 0; i < passo; i++) temp.push(max);
@@ -61,6 +76,10 @@ class MSX {
         for(i = 0; i < passo; i++) temp.push(max);
         par.wave_bit_1 = new Uint8Array(temp);
 
+        /** Ed infine ricalcola la forma d'inda per rappresentare 
+         * il silenzio. Nei file audio Uint8 i valori vanno da 
+         * 0 a 255, per cui il silenzio è nel valore mediano (128) 
+         */
         temp = [];
         for(i = 0; i < passo * 4; i++) temp.push(128);
         par.wave_silenzio = new Uint8Array(temp);
@@ -68,13 +87,20 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-
+    
+    /**
+     * Inserisce un bit all'interno del file audio come forma d'onda
+     */
     inserisci_bit(p_bit)
     {
         var i = 0;
         var par = this.parametri;
         var onda:Uint8Array;
 
+        /**
+         * In base al bit da rappresentare sceglie la forma d'onda più
+         * opportuna
+         */
         if (p_bit == 0) {
             onda = par.wave_bit_0;
         } else if (p_bit == 1) {
@@ -83,6 +109,9 @@ class MSX {
             onda = par.wave_silenzio;
         }
 
+        /**
+         * Scrive la forma d'onda nel file audio
+         */
         for(i = 0; i < onda.length; i++) {
             this.data.push(onda[i]);
         }
@@ -91,6 +120,9 @@ class MSX {
 
     // -=-=---------------------------------------------------------------=-=-
 
+    /**
+     * Inserisce un byte all'interno del file audio
+     */
     inserisci_byte(p_byte)
     {
         // Inserisce un bit di start
@@ -113,8 +145,11 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-
-    inserisci_array(p_array)
+    
+    /**
+     * Inserisce un'array nel file audio  
+     */
+    inserisci_array(p_array:Uint8Array)
     {
         var i = 0;
         for(i = 0; i < p_array.byteLength; i++) {
@@ -124,6 +159,9 @@ class MSX {
 
     // -=-=---------------------------------------------------------------=-=-
 
+    /**
+     * Inserisce una stringa nel file audio
+     */
     inserisci_stringa(p_stringa)
     {
         var i = 0;
@@ -134,8 +172,16 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-
-    inserisci_sincronismo(p_durata)
+    
+    /**
+     * Inserisce un segnale di sincronismo nel file audio.
+     * Il segnale di sincronismo è il classico BEEEEEEEEEEEEEEEEEEEP
+     * che si sente nell'audio all'inizio di ogni file e che serve al
+     * computer a sincronizzarsi alla stessa velocità di trasmissione
+     * dell'audio. Un segnale di sincronismo decente per MSX deve durare
+     * almeno 1500-2000ms.
+     */
+    inserisci_sincronismo(p_durata:number)
     {
         var i = 0;
         var par = this.parametri;
@@ -148,7 +194,10 @@ class MSX {
 
     // -=-=---------------------------------------------------------------=-=-
 
-    inserisci_silenzio(p_durata)
+    /**
+     * Inserisce un periodo di silenzio nel file audio.
+     */
+    inserisci_silenzio(p_durata:number)
     {
         var i = 0;
         var par = this.parametri;
@@ -160,7 +209,11 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
-
+    
+    /**
+     * Genera un blocco completo per trasmettere un file MSX 
+     * all'interno del file audio
+     */
     genera_file(p_blocco)
     {
         this.inserisci_sincronismo(this.parametri.sincronismo_lungo);
