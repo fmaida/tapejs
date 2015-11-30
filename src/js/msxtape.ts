@@ -4,8 +4,7 @@
 ///<reference path="./datablock.ts"/>
 
 
-class MSX {
-    // TODO: sdfsdfsfs
+class MSX {    
     
     // -=-=---------------------------------------------------------------=-=-
     // PARAMETRI GENERALI
@@ -295,8 +294,8 @@ class MSX {
      */
     estrai_blocco(p_inizio):DataBlock
     {
-        var block1:DataBlock;
-        var block2:DataBlock;
+        let block1:DataBlock;
+        let block2:DataBlock;
 
         block1 = this.cerca_blocco(p_inizio);
         if (block1 !== null) {
@@ -319,20 +318,9 @@ class MSX {
     // -=-=---------------------------------------------------------------=-=-
 
     load2()
-    {
-        // Ripeti finchè non trova altri blocchi di intestazione...
-        //    Cerca il primo blocco di intestazione
-        //    Cerca il secondo blocco di intestazione...
-        //       ...se non lo trova, il secondo blocco è la fine del buffer
-        //    Guarda i primi dieci bytes per scoprire il tipo di file...
-        //       ...se è un file ASCII, Binario o Basic...
-        //          Cerca il terzo blocco di intestazione...
-        //             ...se non lo trova, il terzo blocco è la fine del buffer
-        //          Altrimenti...
-        //             ...considera tutto fra il 1o ed il 2o blocco -> custom
-
-        var pos:number = 0;
-        var block:DataBlock;        
+    {        
+        let pos:number = 0;
+        let block:DataBlock;        
 
         while(block !== null) {
             if (pos !== 0) {
