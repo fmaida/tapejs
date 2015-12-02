@@ -33,7 +33,7 @@ var FastBase64 = {
         var dst = '';
         var i = 0;
         while (len > 2) {
-            n = (src[i] << 16) | (src[i+1]<<8) | src[i+2];
+            let n = (src[i] << 16) | (src[i+1]<<8) | src[i+2];
             dst+= this.encLookup[n >> 12] + this.encLookup[n & 0xFFF];
             len-= 3;
             i+= 3;
@@ -59,7 +59,7 @@ var FastBase64 = {
 
 FastBase64.Init();
 
-var RIFFWAVE = function(data) {
+var RIFFWAVE = function(data:any = undefined) {
 
     this.data = [];        // Array containing audio samples
     this.wav = [];         // Array containing the generated wave file
@@ -128,7 +128,5 @@ var RIFFWAVE = function(data) {
     if (data instanceof Array) this.Make(data);
 
 }; // end RIFFWAVE
-
-
 
 

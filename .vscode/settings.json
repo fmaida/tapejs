@@ -5,5 +5,8 @@
 		"**/.DS_Store": true,
 		"**/config.codekit": true,
 		"**/.codekit-cache": true		
-	}
+	},
+	
+	// Controls the font size.
+	"editor.fontSize": 20
 }

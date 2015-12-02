@@ -29,7 +29,7 @@ head
     //- script(type="text/javascript", src="js/riffwave-min.js")
     //- script(type="text/javascript", src="js/msxtape-min.js")    
     script(type="text/javascript", src="js/FileSaver-min.js")    
-    script(type="text/javascript", src="js/riffwave-min.js")
+    //- script(type="text/javascript", src="js/riffwave-min.js")
     script(type="text/javascript", src="js/msxtape.js")    
 
 body
@@ -113,31 +113,38 @@ body
                         a(href="https://github.com/eligrey/FileSaver.js/")
                             | FileSaver.js 
                         | by Eli Grey.
+        
+        div.row.esempio
+            div.col-md-12
+                strong: | Road fighter
                 
         div.row#pulsantiera
             div.col-md-3.col-sm-4                
             
-                button.btn.btn-default.btn-block#esegui
+                button.btn.btn-default.btn-block#esegui1.esegui
                     | Play
             
             div.col-md-3.col-sm-4
                     
-                button.btn.btn-block#salva
-                    | Salva il file
+                button.btn.btn-block#salva1.salva
+                    | Save
                     
             div.col-md-6.col-sm-4
                 
+        div.row.esempio
+            div.col-md-12
+                strong: | Guttblaster
         
         div.row#pulsantiera
             div.col-md-3.col-sm-4
                 
-                button.btn.btn-default.btn-block#esegui
+                button.btn.btn-default.btn-block#esegui2.esegui
                     | Play
             
             div.col-md-3.col-sm-4
                     
-                button.btn.btn-block#salva
-                    | Salva il file
+                button.btn.btn-block#salva2.salva
+                    | Save
                     
             div.col-md-6.col-sm-4
                                 

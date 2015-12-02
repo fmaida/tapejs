@@ -9,16 +9,21 @@ $(document).ready(function(){
 
 
     // Cambia il testo nel pulsante
-    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");
-
-    msx.load("example/pacmania.cas");
+    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");    
 
     // Quando il pulsante "Ripoduci" viene cliccato...
-    $("button#esegui").click(function() {
+    $("button.esegui").click(function() {
         if (riproduci === false) {
             // ...se non stava riproducendo, avvia l'audio
             $(this).html("<span class='glyphicon glyphicon-pause'></span> Pause");
-            msx.audio.play();
+            if ($(this).attr("id") == "esegui1") {
+                msx.play("example/roadf.cas");    
+            } else if ($(this).attr("id") == "esegui2") {
+                msx.play("example/guttblaster.cas");
+            } else {
+                console.log($(this).attr("id"));
+            }
+                        
             riproduci = true;
         } else {
             // ...altrimenti mette in pausa la riproduzione
@@ -50,9 +55,16 @@ $(document).ready(function(){
     }
 
     // Quando il pulsante "Salva" viene cliccato...
-    $("button#salva").click(function() {
+    $("button.salva").click(function() {
+        var name = ""
         var blob = new Blob([dataURItoBlob(msx.wave.dataURI)]); // [window.btoa(msx.wave.dataURI)]);
-        saveAs(blob, "output.wav");
+        name = "output";
+        if (msx.name !== undefined) {            
+            if (msx.name.trim() != "") {
+                name = msx.name.trim();
+            }
+        }
+        saveAs(blob, name + ".wav");
     });
 
 });

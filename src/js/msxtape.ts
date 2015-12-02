@@ -1,4 +1,4 @@
-///<reference path="./lib/riffwave.js.d.ts"/>
+///<reference path="./lib/riffwave.ts"/>
 ///<reference path="./parameters.ts"/>
 ///<reference path="./buffer.ts"/>
 ///<reference path="./datablock.ts"/>
@@ -9,6 +9,7 @@ class MSX {
     // -=-=---------------------------------------------------------------=-=-
     // PARAMETRI GENERALI
     // -=-=---------------------------------------------------------------=-=-
+    public  name:string;
     private parametri:Parameters;
     private buffer:Buffer;
     private audio;
@@ -20,6 +21,8 @@ class MSX {
      */
     constructor()
     {
+        this.name = "";
+        
         this.parametri = new Parameters();
         this.buffer = new Buffer();
 
@@ -232,34 +235,7 @@ class MSX {
         }
 
         this.inserisci_array(p_blocco.data);
-    }
-
-    // -=-=---------------------------------------------------------------=-=-
-
-    /**
-    Carica un file in memoria
-    */
-    load(p_file)
-    {
-
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", p_file, true);
-        oReq.responseType = "arraybuffer";
-
-        var self = this;
-
-        oReq.onload = function(oEvent) {
-            var arrayBuffer = oReq.response; // Note: not oReq.responseText
-            if (arrayBuffer) {
-                var byteArray = new Uint8Array(arrayBuffer);
-                self.buffer.carica(byteArray);
-                self.load2();
-            }
-        }
-
-        oReq.send(null);
-
-    }
+    }    
 
     // -=-=---------------------------------------------------------------=-=-
 
@@ -316,8 +292,40 @@ class MSX {
     }
 
     // -=-=---------------------------------------------------------------=-=-
+    
+    /**
+    Carica ed esegue un file in memoria
+    */
+    play(p_file)
+    {
 
-    load2()
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", p_file, true);
+        oReq.responseType = "arraybuffer";
+
+        var self = this;
+
+        oReq.onload = function(oEvent) {
+            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+            if (arrayBuffer) {
+                var byteArray = new Uint8Array(arrayBuffer);
+                self.buffer.carica(byteArray);
+                self.name = p_file.toLowerCase().trim().replace(".cas", "")                
+                self.load();
+                self.audio.play();
+            }
+        }
+
+        oReq.send(null);
+
+    }
+    
+    // -=-=---------------------------------------------------------------=-=-
+    
+    /**
+     * Continua a caricare il file in memoria
+     */
+    private load()
     {        
         let pos:number = 0;
         let block:DataBlock;        
@@ -337,6 +345,7 @@ class MSX {
         this.wave.Make(this.data); // make the wave file
         this.audio.src = this.wave.dataURI; // set audio source
     }
+    
 }
 
 // var mioMSX = new MSX();
