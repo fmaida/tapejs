@@ -8,27 +8,22 @@ $(document).ready(function(){
     var msx = new MSX();
 
 
-    // Cambia il testo nel pulsante
-    $("button#esegui").html("<span class='glyphicon glyphicon-play'></span> Play");    
+    // Cambia il testo nei pulsanti aggiungendo le icone
+    $("button.esegui").html("<span class='fa fa-play'></span> Play");
+    $("button.salva").html("<span class='fa fa-save'></span> Save");
 
     // Quando il pulsante "Ripoduci" viene cliccato...
     $("button.esegui").click(function() {
         if (riproduci === false) {
             // ...se non stava riproducendo, avvia l'audio
-            $(this).html("<span class='glyphicon glyphicon-pause'></span> Pause");
-            if ($(this).attr("id") == "esegui1") {
-                msx.play("example/roadf.cas");    
-            } else if ($(this).attr("id") == "esegui2") {
-                msx.play("example/guttblaster.cas");
-            } else {
-                console.log($(this).attr("id"));
-            }
-                        
+            $(this).html("<span class='fa fa-pause'></span> Pause");
+            let percorso = $(this).attr("data-path")
+            msx.play(percorso);
             riproduci = true;
         } else {
             // ...altrimenti mette in pausa la riproduzione
             // (non riesco a trovare un metodo "stop")
-            $(this).html("<span class='glyphicon glyphicon-play'></span> Play");
+            $(this).html("<span class='fa fa-play'></span> Play");
             msx.audio.pause();
             riproduci = false;
         }
@@ -68,5 +63,3 @@ $(document).ready(function(){
     });
 
 });
-
-

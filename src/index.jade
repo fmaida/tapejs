@@ -6,8 +6,30 @@ mixin banner_github(p_url)
             src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67", 
             alt="Fork me on GitHub", 
             data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png")
-            
-                        
+
+
+//- Widget che visualizza un programma di esempio
+//- con i pulsanti per riprodurre il file audio e per salvarlo
+
+mixin tape(p_title, p_path, p_id)
+    div.row.esempio
+        div.col-md-12
+            strong=p_title
+
+    div.row#pulsantiera1
+        div.col-md-3.col-sm-4
+
+            button.btn.btn-primary.btn-outline.btn-block.esegui(type="button", id="esegui" + p_id, data-path=p_path)
+                | Play
+
+        div.col-md-3.col-sm-4
+
+            button.btn.btn-default.btn-block.salva(type="button", id="salva" + p_id)
+                | Save
+
+        div.col-md-6.col-sm-4
+
+
 //- Da qui in poi inizia la pagina web vera e propria
 
 head
@@ -17,14 +39,15 @@ head
     
     //- Carica il foglio di stile css
     
-    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css", rel="stylesheet", type="text/css")
+    link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css", rel="stylesheet", type="text/css")
+    link(href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", rel="stylesheet", type="text/css")
     link(href="css/style.css", rel="stylesheet", type="text/css")
     
     //- Carica le librerie in javascript
     
-    script(type="text/javascript", src="js/jquery-1.11.3.min.js")
+    script(type="text/javascript", src="js/jquery-3.4.1.min.js")
     //- script(type="text/javascript", src="https://code.jquery.com/jquery-1.11.3.min.js")        
-    script(type="text/javascript", src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js")
+    script(type="text/javascript", src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js")
     //- script(type="text/javascript", src="js/FileSaver-min.js")    
     //- script(type="text/javascript", src="js/riffwave-min.js")
     //- script(type="text/javascript", src="js/msxtape-min.js")    
@@ -74,7 +97,7 @@ body
                         | http://www.github.com/fmaida/tapejs
                                 
                 h5
-                    span.glyphicon.glyphicon-warning-sign
+                    span.fa.fa-exclamation-triangle
                     |  WARNING: The source code is heavily unfinished and 
                     | almost all the comments and the variable names are 
                     | still written in Italian.
@@ -121,47 +144,20 @@ body
                 p
                     | Click on any of those buttons to play or save a file 
                     | (saving a file actually works only on Google Chrome AFAIK)
-        div.row.esempio
-            div.col-md-12
-                strong: | Road fighter
-                
-        div.row#pulsantiera
-            div.col-md-3.col-sm-4                
-            
-                button.btn.btn-default.btn-block#esegui1.esegui
-                    | Play
-            
-            div.col-md-3.col-sm-4
-                    
-                button.btn.btn-block#salva1.salva
-                    | Save
-                    
-            div.col-md-6.col-sm-4
-                
-        div.row.esempio
-            div.col-md-12
-                strong: | Guttblaster
-        
-        div.row#pulsantiera
-            div.col-md-3.col-sm-4
-                
-                button.btn.btn-default.btn-block#esegui2.esegui
-                    | Play
-            
-            div.col-md-3.col-sm-4
-                    
-                button.btn.btn-block#salva2.salva
-                    | Save
-                    
-            div.col-md-6.col-sm-4
-                                
-        div.row
-            div.col-md-12
-            
-                a(href="http://www.kaiko.it")
-                    img#logo(src="img/kaiko_logo.png", alt="Kaiko")
-                    
-                    
+
+        +tape("Road Blaster", "example/roadf.cas", "1")
+        +tape("Guttblaster", "example/guttblaster.cas", "2")
+        +tape("Athletic Land", "example/athland.cas", "3")
+
+
+        //-
+            div.row
+                div.col-md-12
+
+                    a(href="http://www.kaiko.it")
+                        img#logo(src="img/kaiko_logo.png", alt="Kaiko")
+
+
     +banner_github("https://github.com/fmaida/tapejs/")
     
     script(type="text/javascript", src="js/script-min.js")
