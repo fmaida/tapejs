@@ -18,4 +18,4 @@ In order to generate and download wav files this application makes use of [riffw
 
 ### Where can I try a demo of this script ?
 
-You can see a demo in action on this page: http://www.kaiko.it/tapejs
+You can see a demo in action on this page: <https://fmaida.github.io/tapejs>
